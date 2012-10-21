@@ -21,12 +21,82 @@ $(function () {
 function CSREngine() {
 
     this.consolePrint = false;
+    this.documents = new Array();
 
 }
 
 CSREngine.prototype = {
 
-    // Member functions
+    // Private functions
+
+    addDocument: function (location) {
+        var doc = new Document(location);
+        this.documents.push(doc);
+    },
+
+    removeDocument: function (location) {
+    },
+
+    addToggleButtons: function () {
+        $('#csr-wrapper').before('<button id="csr-button" class="csr csr-button">Minimize</button>');
+
+        $('#csr-button').on('click', function () {
+            if ($('#csr-wrapper').css('display') == "none") {
+                $('#csr-wrapper').slideDown();
+                $(this).html('Minimize');
+            }
+            else {
+                $('#csr-wrapper').slideUp();
+                $(this).html('Maximize');
+            }
+        });
+    },
+
+    printCode: function (code) {
+        $('#csr-wrapper').append('<pre><code>' + code + '</code></pre>');
+    },
+
+    test: function () {
+        /*** TEST AREA **/
+
+        /*$('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');
+        $('#csr-wrapper').append('<p>This is a message.</p>');*/
+
+        var s = 'console.log("trial code");';
+        this.printCode(s);
+
+        this.addDocument("/Content/site.css");
+        this.addDocument("/Scripts/modernizr-2.5.3.js");
+        for (var i = 0; i < this.documents.length; i++) {
+            console.log(this.documents[i].getLocation());
+            this.documents[i].printContent();
+        }
+    },
+
+    // Public functions
 
     initialize: function (consolePrint) {
 
@@ -49,56 +119,54 @@ CSREngine.prototype = {
             $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
             $('#csr-wrapper').append('<div>Enter the dragon.</div>');
 
-            //this.addTestMessages();;
-            var s = 'console.log("trial code");';
-            $('#csr-wrapper').append('<pre><code>' + s + '</code></pre>');
+            this.test();
         }
 
+    }
+
+};
+
+// Document Class
+
+function Document(location) {
+
+    this.location = location;
+    this.content;
+
+    this.initialize();
+
+}
+
+Document.prototype = {
+
+    getLocation: function () { return this.location; },
+    setLocation: function (loc) { this.location = loc },
+
+    printContent: function () {
+        console.log(this.content);
     },
 
-    getConsolePrint: function () { return this.consolePrint; },
+    readContent: function () {
+        var URL = this.getLocation();
+        var ready = false;
+        var doc = this;
 
-    addToggleButtons: function () {
-        $('#csr-wrapper').before('<button id="csr-button" class="csr csr-button">Minimize</button>');
-
-        $('#csr-button').on('click', function () {
-            if ($('#csr-wrapper').css('display') == "none") {
-                $('#csr-wrapper').slideDown();
-                $(this).html('Minimize');
-            }
-            else {
-                $('#csr-wrapper').slideUp();
-                $(this).html('Maximize');
-            }
+        $.ajax({
+            url: URL,
+            success: function (data) {
+                doc.content = data;
+            },
+            error: function () {
+                alert("File does not exist");
+            },
+            async: false
         });
     },
 
-    addTestMessages: function () {
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
+    initialize: function () {
+
+        this.readContent();
+
     }
 
 };
