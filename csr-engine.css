@@ -1,0 +1,45 @@
+﻿/*
+*
+* Client-Side Reliability Styles
+* Steve Pappas
+* Columbia University
+*
+*/
+
+#csr-wrapper {
+    border-bottom: 1px solid #757575;
+    margin: 0;
+    max-height: 400px;
+    overflow: auto;
+    padding: 0 12px 8px 12px;
+}
+
+.csr {
+    background-color: #E5E5E5;
+    font-family: 'Segoe UI', Helevetica, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.csr h1 { font-size: 20px; margin: 4px 0 4px 0; }
+.csr h2 { font-size: 16px; margin: 2px 0 2px 0; }
+.csr h3 { font-size: 14px; margin: 2px 0 2px 0; }
+
+.csr-button {
+    position: absolute;
+    background-color: #F5F5F5;
+    border: 1px solid #BBB;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    color: #181818;
+    height: auto;
+    left: 47%;
+    margin: 0 auto;
+    top: 0;
+}
+
+.csr-button:hover, .csr-button:active { border-color: #A0A0A0; }
+
+pre {
+    margin-left: 12px;
+}
