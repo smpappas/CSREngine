@@ -22,6 +22,8 @@ function CSREngine() {
 
     this.consolePrint = false;
     this.documents = new Array();
+    this.filters = new Filters();
+    this.htmlSource;
 
 }
 
@@ -48,6 +50,29 @@ CSREngine.prototype = {
             else {
                 $('#csr-wrapper').slideUp();
                 $(this).html('Maximize');
+            }
+        });
+    },
+
+    populateDocuments: function () {
+        var engine = this;
+        var filters = this.filters;
+
+        // Find all CSS documents
+        $('link').each(function () {
+            var source = $(this).prop('href');
+            var type = $(this).prop('rel');
+            if (!filters.ignore(source) && type == "stylesheet") {
+                engine.addDocument(source);
+            }
+        });
+
+        // Find all JavaScript documents
+        $('script').each(function () {
+            var source = $(this).prop('src');
+            var type = $(this).prop('type');
+            if (!filters.ignore(source) && source != "") {
+                engine.addDocument(source);
             }
         });
     },
@@ -88,12 +113,18 @@ CSREngine.prototype = {
         var s = 'console.log("trial code");';
         this.printCode(s);
 
-        this.addDocument("/Content/site.css");
-        this.addDocument("/Scripts/modernizr-2.5.3.js");
         for (var i = 0; i < this.documents.length; i++) {
             console.log(this.documents[i].getLocation());
-            this.documents[i].printContent();
+            //this.documents[i].printContent();
+            //this.printCode(this.documents[i].getContent());
         }
+
+        //console.log(this.htmlSource);
+
+        /*var lines = this.htmlSource.split("\n");
+        $.each(lines, function (n, line) {
+            console.log(line);
+        });*/
     },
 
     // Public functions
@@ -101,6 +132,7 @@ CSREngine.prototype = {
     initialize: function (consolePrint) {
 
         this.consolePrint = consolePrint;
+        this.htmlSource = $('html').html();
 
         // User has chosen to print to JavaScript console instead of within the page
         if (this.consolePrint) {
@@ -110,6 +142,7 @@ CSREngine.prototype = {
         // By default, results will be displayed as part of the current page
         else {
             // Add CSR Engine stylesheet and create section before the body
+            // HARD CODE
             $('head').append('<link rel="stylesheet" href="http://localhost:4231/Scripts/csr-engine.css" type="text/css" />');
             $('body').before('<section id="csr-wrapper" class="csr"></section>');
 
@@ -118,6 +151,9 @@ CSREngine.prototype = {
             // Print introduction message
             $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
             $('#csr-wrapper').append('<div>Enter the dragon.</div>');
+
+            // Populate array of linked client-side documents
+            this.populateDocuments();
 
             this.test();
         }
@@ -141,6 +177,9 @@ Document.prototype = {
 
     getLocation: function () { return this.location; },
     setLocation: function (loc) { this.location = loc },
+
+    getContent: function () { return this.content; },
+    setContent: function (con) { this.content = con },
 
     printContent: function () {
         console.log(this.content);
@@ -166,6 +205,42 @@ Document.prototype = {
     initialize: function () {
 
         this.readContent();
+
+    }
+
+};
+
+// Filters Class
+
+function Filters() {
+
+    this.filters = new Array();
+
+    this.initialize();
+
+}
+
+Filters.prototype = {
+
+    getFilters: function () { return this.filters; },
+
+    ignore: function (source) {
+        source = source.toLowerCase();
+        for (var i = 0; i < this.filters.length; i++) {
+            if (source.indexOf(this.filters[i].toLowerCase()) >= 0) {
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    initialize: function () {
+
+        // Add standard third party files to ignore - move this list to a separate file/database later
+        this.filters.push("csr-engine");
+        this.filters.push("jquery");
+        this.filters.push("knockout");
 
     }
 

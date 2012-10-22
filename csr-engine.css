@@ -26,7 +26,7 @@
 .csr h3 { font-size: 14px; margin: 2px 0 2px 0; }
 
 .csr-button {
-    position: absolute;
+    position: fixed;
     background-color: #F5F5F5;
     border: 1px solid #BBB;
     border-top: none;
