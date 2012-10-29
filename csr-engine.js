@@ -239,8 +239,26 @@ Filters.prototype = {
 
         // Add standard third party files to ignore - move this list to a separate file/database later
         this.filters.push("csr-engine");
+        this.filters.push("agility");
+        this.filters.push("angular");
+        this.filters.push("backbone");
+        this.filters.push("batman");
+        this.filters.push("coffee-script");
+        this.filters.push("dojo");
+        this.filters.push("ember");
         this.filters.push("jquery");
+        this.filters.push("knockback");
         this.filters.push("knockout");
+        this.filters.push("less");
+        this.filters.push("mochikit");
+        this.filters.push("midori");
+        this.filters.push("mootools");
+        this.filters.push("prototype");
+        this.filters.push("qooxdoo");
+        this.filters.push("scriptaculous");
+        this.filters.push("spine");
+        this.filters.push("underscore");
+        this.filters.push("yui");
 
     }
 
