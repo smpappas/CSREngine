@@ -23,6 +23,7 @@ function CSREngine() {
     this.consolePrint = false;
     this.documents = new Array();
     this.filters = new Filters();
+    this.util = new Util();
     this.htmlSource;
 
 }
@@ -31,8 +32,8 @@ CSREngine.prototype = {
 
     // Private functions
 
-    addDocument: function (location) {
-        var doc = new Document(location);
+    addDocument: function (location, type) {
+        var doc = new Document(location, type);
         this.documents.push(doc);
     },
 
@@ -63,7 +64,7 @@ CSREngine.prototype = {
             var source = $(this).prop('href');
             var type = $(this).prop('rel');
             if (!filters.ignore(source) && type == "stylesheet") {
-                engine.addDocument(source);
+                engine.addDocument(source, 'css');
             }
         });
 
@@ -72,49 +73,38 @@ CSREngine.prototype = {
             var source = $(this).prop('src');
             var type = $(this).prop('type');
             if (!filters.ignore(source) && source != "") {
-                engine.addDocument(source);
+                engine.addDocument(source, 'js');
             }
         });
     },
 
-    printCode: function (code) {
-        $('#csr-wrapper').append('<pre><code>' + code + '</code></pre>');
+    analyzeDocuments: function () {
+        for (var i = 0; i < this.documents.length; i++) {
+            var doc = this.documents[i];
+            var docAnalysis = new DocAnalysis(doc);
+            docAnalysis.runAnalysis();
+        }
     },
 
     test: function () {
         /*** TEST AREA **/
 
-        /*$('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');
-        $('#csr-wrapper').append('<p>This is a message.</p>');*/
-
+        this.util.printString("Error found at line 9 of document.js:");
         var s = 'console.log("trial code");';
-        this.printCode(s);
+        var codeBlock = new CodeBlock(s, 9);
+        codeBlock.add(s, 10);
+        codeBlock.add('     ' + s, 11);
+        codeBlock.add(s, 12);
+        codeBlock.print();
+
+        this.util.printString("Error found at line 123 of document.js:");
+        s = 'x = parseInt(s);';
+        var codeBlock = new CodeBlock(s, 123);
+        codeBlock.print();
 
         for (var i = 0; i < this.documents.length; i++) {
             console.log(this.documents[i].getLocation());
+            console.log(this.documents[i].getType());
             //this.documents[i].printContent();
             //this.printCode(this.documents[i].getContent());
         }
@@ -150,10 +140,11 @@ CSREngine.prototype = {
 
             // Print introduction message
             $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
-            $('#csr-wrapper').append('<div>Enter the dragon.</div>');
+            //$('#csr-wrapper').append('<div>Enter the dragon.</div>');
 
             // Populate array of linked client-side documents
             this.populateDocuments();
+            this.analyzeDocuments();
 
             this.test();
         }
@@ -162,12 +153,50 @@ CSREngine.prototype = {
 
 };
 
+// DocAnalysis Class
+
+function DocAnalysis(document) {
+
+    this.document = document;
+    this.util = new Util();
+
+    this.initialize();
+
+}
+
+DocAnalysis.prototype = {
+
+    runCssAnalysis: function () {
+        this.util.printString("Initiating css test cases");
+    },
+
+    runJsAnalysis: function () {
+        this.util.printString("Initiating js test cases");
+    },
+
+    runAnalysis: function () {
+        this.util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-italic");
+
+        if (this.document.getType() === 'css') {
+            this.runCssAnalysis();
+        }
+        else if (this.document.getType() === 'js') {
+            this.runJsAnalysis();
+        }
+    },
+
+    initialize: function () {
+        console.log(this.document.getType());
+    }
+};
+
 // Document Class
 
-function Document(location) {
+function Document(location, type) {
 
     this.location = location;
     this.content;
+    this.type = type;
 
     this.initialize();
 
@@ -180,6 +209,9 @@ Document.prototype = {
 
     getContent: function () { return this.content; },
     setContent: function (con) { this.content = con },
+
+    getType: function () { return this.type; },
+    setType: function (type) { this.type = type },
 
     printContent: function () {
         console.log(this.content);
@@ -260,6 +292,67 @@ Filters.prototype = {
         this.filters.push("underscore");
         this.filters.push("yui");
 
+    }
+
+};
+
+// CodeBlock Class
+
+function CodeBlock(code, line) {
+
+    this.code;
+
+    this.initialize(code, line);
+
+}
+
+CodeBlock.prototype = {
+
+    initialize: function (code, line) {
+        this.code = '<pre><div class="code"><code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
+    },
+
+    add: function (code, line) {
+        this.code = this.code + '<br /><code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
+    },
+
+    setSpaces: function (line) {
+        var spaces;
+        if (line < 10)
+            spaces = "&nbsp;&nbsp;&nbsp;&nbsp;";
+        else if (line < 100)
+            spaces = "&nbsp;&nbsp;&nbsp;";
+        else if (line < 1000)
+            spaces = "&nbsp;&nbsp;";
+        else
+            spaces = "&nbsp;";
+        return spaces;
+    },
+
+    print: function () {
+        var code = this.code;
+        $('#csr-wrapper').append(code + '</div></pre>');
+    }
+
+};
+
+// Util Class
+
+function Util() {
+
+    this.description = "This class contains various utility functions for use throughout the script";
+
+}
+
+Util.prototype = {
+
+    printString: function (s, classes) {
+        if (classes) {
+            $('#csr-wrapper').append('<p class="' + classes + '">' + s + '</p>');
+        }
+        else {
+            $('#csr-wrapper').append('<p>' + s + '</p>');
+        }
     }
 
 };
