@@ -22,8 +22,8 @@ function CSREngine() {
 
     this.consolePrint = false;
     this.documents = new Array();
+    this.testCases = new Array();
     this.filters = new Filters();
-    this.util = new Util();
     this.htmlSource;
 
 }
@@ -38,6 +38,14 @@ CSREngine.prototype = {
     },
 
     removeDocument: function (location) {
+    },
+
+    addTestCase: function (nameSpace, location, type) {
+        var tc = new TestCase(nameSpace, location, type);
+        this.testCases.push(tc);
+    },
+
+    removeTestCase: function (nameSPace) {
     },
 
     addToggleButtons: function () {
@@ -78,6 +86,21 @@ CSREngine.prototype = {
         });
     },
 
+    populateTestCases: function () {
+        csrTestCases.populateTestCases();
+        /*for (var i = 0; i < this.testCases.length; i++) {
+            var tc = this.testCases[i];
+            console.log(tc.nameSpace);
+        }*/
+
+        // for each test case, add a link to the js file
+        for (var i = 0; i< this.testCases.length;  i++) {
+            var tc = this.testCases[i];
+            console.log('<script src="' + tc.location + '" type="text/javascript" />');
+            $('head').append('<script src="' + tc.location + '" type="text/javascript" />');
+        }
+    },
+
     analyzeDocuments: function () {
         for (var i = 0; i < this.documents.length; i++) {
             var doc = this.documents[i];
@@ -89,7 +112,7 @@ CSREngine.prototype = {
     test: function () {
         /*** TEST AREA **/
 
-        this.util.printString("Error found at line 9 of document.js:");
+        util.printString("Error found at line 9 of document.js:");
         var s = 'console.log("trial code");';
         var codeBlock = new CodeBlock(s, 9);
         codeBlock.add(s, 10);
@@ -97,7 +120,7 @@ CSREngine.prototype = {
         codeBlock.add(s, 12);
         codeBlock.print();
 
-        this.util.printString("Error found at line 123 of document.js:");
+        util.printString("Error found at line 123 of document.js:");
         s = 'x = parseInt(s);';
         var codeBlock = new CodeBlock(s, 123);
         codeBlock.print();
@@ -134,6 +157,7 @@ CSREngine.prototype = {
             // Add CSR Engine stylesheet and create section before the body
             // HARD CODE
             $('head').append('<link rel="stylesheet" href="http://localhost:4231/Scripts/csr-engine.css" type="text/css" />');
+            $('head').append('<script src="http://localhost:4231/Scripts/csr-test-cases.js" type="text/javascript" />');
             $('body').before('<section id="csr-wrapper" class="csr"></section>');
 
             this.addToggleButtons();
@@ -144,6 +168,7 @@ CSREngine.prototype = {
 
             // Populate array of linked client-side documents
             this.populateDocuments();
+            this.populateTestCases();
             this.analyzeDocuments();
 
             this.test();
@@ -158,7 +183,6 @@ CSREngine.prototype = {
 function DocAnalysis(document) {
 
     this.document = document;
-    this.util = new Util();
 
     this.initialize();
 
@@ -167,15 +191,25 @@ function DocAnalysis(document) {
 DocAnalysis.prototype = {
 
     runCssAnalysis: function () {
-        this.util.printString("Initiating css test cases");
+        for (var i = 0; i < window.CSREngine.testCases.length; i++) {
+            var tc = window.CSREngine.testCases[i];
+            if (tc.type == "css") {
+                eval(tc.nameSpace + ".execute(this.document)");
+            }
+        }
     },
 
     runJsAnalysis: function () {
-        this.util.printString("Initiating js test cases");
+        for (var i = 0; i < window.CSREngine.testCases.length; i++) {
+            var tc = window.CSREngine.testCases[i];
+            if (tc.type == "js") {
+                eval(tc.nameSpace + ".execute(this.document)");
+            }
+        }
     },
 
     runAnalysis: function () {
-        this.util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-italic");
+        util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-italic");
 
         if (this.document.getType() === 'css') {
             this.runCssAnalysis();
@@ -188,6 +222,20 @@ DocAnalysis.prototype = {
     initialize: function () {
         console.log(this.document.getType());
     }
+};
+
+// TestCase Class
+
+function TestCase(nameSpace, location, type) {
+
+    this.nameSpace = nameSpace;
+    this.location = location;
+    this.type = type;
+
+}
+
+TestCase.prototype = {
+
 };
 
 // Document Class
@@ -336,15 +384,9 @@ CodeBlock.prototype = {
 
 };
 
-// Util Class
+// Utility functions
 
-function Util() {
-
-    this.description = "This class contains various utility functions for use throughout the script";
-
-}
-
-Util.prototype = {
+var util = {
 
     printString: function (s, classes) {
         if (classes) {
