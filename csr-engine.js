@@ -25,6 +25,7 @@ function CSREngine() {
     this.testCases = new Array();
     this.filters = new Filters();
     this.htmlSource;
+    this.tcDone = false;
 
 }
 
@@ -88,16 +89,12 @@ CSREngine.prototype = {
 
     populateTestCases: function () {
         csrTestCases.populateTestCases();
-        /*for (var i = 0; i < this.testCases.length; i++) {
-            var tc = this.testCases[i];
-            console.log(tc.nameSpace);
-        }*/
 
         // for each test case, add a link to the js file
-        for (var i = 0; i< this.testCases.length;  i++) {
+        for (var i = 0; i < this.testCases.length;  i++) {
             var tc = this.testCases[i];
-            console.log('<script src="' + tc.location + '" type="text/javascript" />');
-            $('head').append('<script src="' + tc.location + '" type="text/javascript" />');
+            console.log('<script src="' + tc.location + '" type="text/javascript"></script>');
+            $('head').append('<script src="' + tc.location + '" type="text/javascript"></script>');
         }
     },
 
@@ -112,18 +109,18 @@ CSREngine.prototype = {
     test: function () {
         /*** TEST AREA **/
 
-        util.printString("Error found at line 9 of document.js:");
+        /*util.printString("Error found at line 9 of document.js:");
         var s = 'console.log("trial code");';
         var codeBlock = new CodeBlock(s, 9);
         codeBlock.add(s, 10);
         codeBlock.add('     ' + s, 11);
         codeBlock.add(s, 12);
-        codeBlock.print();
+        codeBlock.print();*/
 
-        util.printString("Error found at line 123 of document.js:");
+        /*util.printString("Error found at line 123 of document.js:");
         s = 'x = parseInt(s);';
         var codeBlock = new CodeBlock(s, 123);
-        codeBlock.print();
+        codeBlock.print();*/
 
         for (var i = 0; i < this.documents.length; i++) {
             console.log(this.documents[i].getLocation());
@@ -156,22 +153,24 @@ CSREngine.prototype = {
         else {
             // Add CSR Engine stylesheet and create section before the body
             // HARD CODE
-            $('head').append('<link rel="stylesheet" href="http://localhost:4231/Scripts/csr-engine.css" type="text/css" />');
-            $('head').append('<script src="http://localhost:4231/Scripts/csr-test-cases.js" type="text/javascript" />');
-            $('body').before('<section id="csr-wrapper" class="csr"></section>');
+            $('head').append('<link rel="stylesheet" href="http://www.columbia.edu/~smp2183/csr-engine/css/csr-engine.css" type="text/css" />');
+            var engine = this;
+            $.getScript("http://www.columbia.edu/~smp2183/csr-engine/js/csr-test-cases.js", function () {
+                $('body').before('<section id="csr-wrapper" class="csr"></section>');
 
-            this.addToggleButtons();
+                engine.addToggleButtons();
 
-            // Print introduction message
-            $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
-            //$('#csr-wrapper').append('<div>Enter the dragon.</div>');
+                // Print introduction message
+                $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
+                //$('#csr-wrapper').append('<div>Enter the dragon.</div>');
 
-            // Populate array of linked client-side documents
-            this.populateDocuments();
-            this.populateTestCases();
-            this.analyzeDocuments();
+                // Populate array of linked client-side documents
+                engine.populateDocuments();
+                engine.populateTestCases();
+                engine.analyzeDocuments();
 
-            this.test();
+                engine.test();
+            });
         }
 
     }
@@ -276,7 +275,7 @@ Document.prototype = {
                 doc.content = data;
             },
             error: function () {
-                alert("File does not exist");
+                alert(doc.location + " does not exist");
             },
             async: false
         });
@@ -339,6 +338,7 @@ Filters.prototype = {
         this.filters.push("spine");
         this.filters.push("underscore");
         this.filters.push("yui");
+        this.filters.push("google");
 
     }
 
