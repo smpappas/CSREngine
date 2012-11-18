@@ -46,7 +46,7 @@ CSREngine.prototype = {
         this.testCases.push(tc);
     },
 
-    removeTestCase: function (nameSPace) {
+    removeTestCase: function (nameSpace) {
     },
 
     addToggleButtons: function () {
@@ -91,11 +91,11 @@ CSREngine.prototype = {
         csrTestCases.populateTestCases();
 
         // for each test case, add a link to the js file
-        for (var i = 0; i < this.testCases.length;  i++) {
+        /*for (var i = 0; i < this.testCases.length;  i++) {
             var tc = this.testCases[i];
             console.log('<script src="' + tc.location + '" type="text/javascript"></script>');
             $('head').append('<script src="' + tc.location + '" type="text/javascript"></script>');
-        }
+        }*/
     },
 
     analyzeDocuments: function () {
@@ -216,6 +216,10 @@ DocAnalysis.prototype = {
         else if (this.document.getType() === 'js') {
             this.runJsAnalysis();
         }
+
+        if (!this.document.getErrorCount()) {
+            util.printString("No errors found in document");
+        }
     },
 
     initialize: function () {
@@ -244,6 +248,7 @@ function Document(location, type) {
     this.location = location;
     this.content;
     this.type = type;
+    this.errorCount;
 
     this.initialize();
 
@@ -260,6 +265,10 @@ Document.prototype = {
     getType: function () { return this.type; },
     setType: function (type) { this.type = type },
 
+    getErrorCount: function () { return this.errorCount; },
+    setErrorCount: function (type) { this.errorCount = type },
+    addError: function () { ++this.errorCount; },
+
     printContent: function () {
         console.log(this.content);
     },
@@ -275,7 +284,7 @@ Document.prototype = {
                 doc.content = data;
             },
             error: function () {
-                alert(doc.location + " does not exist");
+                console.log(doc.location + " does not exist");
             },
             async: false
         });
@@ -283,6 +292,7 @@ Document.prototype = {
 
     initialize: function () {
 
+        this.errorCount = 0;
         this.readContent();
 
     }
