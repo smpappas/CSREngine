@@ -33,6 +33,9 @@ CSREngine.prototype = {
 
     // Private functions
 
+    getHtmlSource: function () { return this.htmlSource; },
+    setHtmlSource: function (source) { this.htmlSource = source; },
+
     addDocument: function (location, type) {
         var doc = new Document(location, type);
         this.documents.push(doc);
@@ -67,6 +70,8 @@ CSREngine.prototype = {
     populateDocuments: function () {
         var engine = this;
         var filters = this.filters;
+
+        engine.addDocument('HTML Source', 'html');
 
         // Find all CSS documents
         $('link').each(function () {
@@ -128,13 +133,6 @@ CSREngine.prototype = {
             //this.documents[i].printContent();
             //this.printCode(this.documents[i].getContent());
         }
-
-        //console.log(this.htmlSource);
-
-        /*var lines = this.htmlSource.split("\n");
-        $.each(lines, function (n, line) {
-            console.log(line);
-        });*/
     },
 
     // Public functions
@@ -146,6 +144,7 @@ CSREngine.prototype = {
 
         // User has chosen to print to JavaScript console instead of within the page
         if (this.consolePrint) {
+            // This option does not print much at the moment
             console.log('Client-Side Reliability Engine');
             console.log('   Enter the dragon.');
         }
@@ -189,6 +188,15 @@ function DocAnalysis(document) {
 
 DocAnalysis.prototype = {
 
+    runHtmlAnalysis: function () {
+        for (var i = 0; i < window.CSREngine.testCases.length; i++) {
+            var tc = window.CSREngine.testCases[i];
+            if (tc.type == "html") {
+                eval(tc.nameSpace + ".execute(this.document)");
+            }
+        }
+    },
+
     runCssAnalysis: function () {
         for (var i = 0; i < window.CSREngine.testCases.length; i++) {
             var tc = window.CSREngine.testCases[i];
@@ -208,9 +216,12 @@ DocAnalysis.prototype = {
     },
 
     runAnalysis: function () {
-        util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-italic");
+        util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold");
 
-        if (this.document.getType() === 'css') {
+        if (this.document.getType() === 'html') {
+            this.runHtmlAnalysis();
+        }
+        else if (this.document.getType() === 'css') {
             this.runCssAnalysis();
         }
         else if (this.document.getType() === 'js') {
@@ -290,10 +301,19 @@ Document.prototype = {
         });
     },
 
+    getLines: function () {
+        return this.getContent().split('\n');
+    },
+
     initialize: function () {
 
         this.errorCount = 0;
-        this.readContent();
+        if (this.type == "html") {
+            this.content = window.CSREngine.getHtmlSource();
+        }
+        else {
+            this.readContent();
+        }
 
     }
 
@@ -374,6 +394,10 @@ CodeBlock.prototype = {
         this.code = this.code + '<br /><code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
     },
 
+    clear: function () {
+        this.code = "";
+    },
+
     setSpaces: function (line) {
         var spaces;
         if (line < 10)
@@ -405,6 +429,15 @@ var util = {
         else {
             $('#csr-wrapper').append('<p>' + s + '</p>');
         }
+    },
+
+    printError: function (lineNum, e) {
+        var s = "Error found at line " + lineNum + ": " + e;
+        util.printString(s, "error");
+    },
+
+    escapeHTML: function (s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
 };

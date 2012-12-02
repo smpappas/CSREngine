@@ -9,7 +9,7 @@
 #csr-wrapper {
     border-bottom: 1px solid #757575;
     margin: 0;
-    max-height: 320px;
+    max-height: 288px;
     overflow: auto;
     padding: 0 12px 8px 12px;
 }
@@ -21,7 +21,7 @@
     font-weight: normal;
 }
 
-.csr h1 { font-size: 20px; margin: 4px 0 4px 0; }
+.csr h1 { color: #181818; font-size: 20px; margin: 4px 0 4px 0; text-shadow: 2px 2px 2px #B8B6B9; }
 .csr h2 { font-size: 16px; margin: 2px 0 2px 0; }
 .csr h3 { font-size: 14px; margin: 2px 0 2px 0; }
 
@@ -57,6 +57,7 @@ pre {
     border-radius: 5px;
     color: #DEDEDE;
     margin-bottom: 0;
+    overflow: hidden;
     padding: 4px 6px 5px 0;
 }
 
@@ -68,3 +69,5 @@ code {
     color: greenyellow;
     font-weight: bold;
 }
+
+.error { color: #AD0000; }
