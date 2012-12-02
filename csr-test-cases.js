@@ -1,13 +1,22 @@
-﻿var csrTestCases = {
+﻿/*
+*
+* Client-Side Reliability Engine
+* csr-test-cases.js
+* Steve Pappas
+* Columbia University
+*
+*/
+
+var csrTestCases = {
 
     addTestCase: function (nameSpace, location, type) {
         window.CSREngine.addTestCase(nameSpace, location, type);
     },
 
     populateTestCases: function () {
-        this.addTestCase("csrIntRadixTest", "http://www.columbia.edu/~smp2183/csr-engine/js/csr-js/csr-radix-test.js", "js");
-        this.addTestCase("csrFloatRadixTest", "http://www.columbia.edu/~smp2183/csr-engine/js/csr-js/csr-radix-test.js", "js");
-        this.addTestCase("csrFallbackFontTest", "http://www.columbia.edu/~smp2183/csr-engine/js/csr-js/csr-fallback-font-test.js", "css");
+        this.addTestCase("csrIntRadixTest", null, "js");
+        this.addTestCase("csrFloatRadixTest", null, "js");
+        this.addTestCase("csrFallbackFontTest", null, "css");
         this.addTestCase("csrAltTextTest", null, "html");
         this.addTestCase("csrScriptTest", null, "html");
     }
