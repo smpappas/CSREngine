@@ -55,4 +55,41 @@ New test cases can be added into the file csr-test-cases.js.  Existing test case
     
 The execute function of your new test case will be called automatically.  There is no restriction to adding more helper functions within your new test namespace, and in fact this is encouraged for code clarity.  These functions can be called from execute, i.e. execute() can be thought of as a main() function, where code execution for your test case begins.
 
-__Utility Functions__
+__Helper Functions__
+
+There are a number of helper functions available to help with implementing test cases.  Please use existing examples as reference.
+
+_Documents_
+
+__`Document.getLines()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns an array that consists of the document split into lines.  This allows traversal of the document line by line using a __for__ loop or similar.
+
+__`Document.addError()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Should be called when an error is found.  This is used to track the number of errors found in each document.
+
+_Code Blocks_
+
+A CodeBlock class has been implemented to make it easy to print formatted code to screen.  Example usage is shown below, and member functions are described.
+
+    var lines = document.getLines();
+    for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        
+        // Trim line to ensure trailing spaces and new lines are not included
+        var cb = new CodeBlock(line.trim(), i+1);
+        cb.print();
+    }
+    
+__`CodeBlock(code, lineNumber)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Initialize a new CodeBlock instance with code found at lineNumber.  Parameters code and lineNumber are optional, and CodeBlock will be initialized to be empty if not specified.
+
+__`CodeBlock.add(code, lineNumber)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adds code found at lineNumber to current CodeBlock instance.  This can be used to create a single-line code block when the current instance is empty, or used to create multiline code blocks by calling this function on sequential lines of code.
+
+__`CodeBlock.clear()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Empties the current CodeBlock instance.  New code can be added to the existing code block through CodeBlock.add().
+
+__`CodeBlock.print()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prints the current CodeBlock instance to screen.
+
+_General Utility_
