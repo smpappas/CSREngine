@@ -107,8 +107,10 @@ CSREngine.prototype = {
     analyzeDocuments: function () {
         for (var i = 0; i < this.documents.length; i++) {
             var doc = this.documents[i];
-            var docAnalysis = new DocAnalysis(doc);
-            docAnalysis.runAnalysis();
+            if (doc.getContent()) {
+                var docAnalysis = new DocAnalysis(doc);
+                docAnalysis.runAnalysis();
+            }
         }
     },
 
@@ -129,8 +131,6 @@ CSREngine.prototype = {
         codeBlock.print();*/
 
         for (var i = 0; i < this.documents.length; i++) {
-            console.log(this.documents[i].getLocation());
-            console.log(this.documents[i].getType());
             //this.documents[i].printContent();
             //this.printCode(this.documents[i].getContent());
         }
@@ -235,7 +235,7 @@ DocAnalysis.prototype = {
     },
 
     initialize: function () {
-        console.log(this.document.getType());
+        //console.log(this.document.getType());
     }
 };
 
@@ -296,7 +296,9 @@ Document.prototype = {
                 doc.content = data;
             },
             error: function () {
-                console.log(doc.location + " does not exist");
+                console.log(doc.location + " contains compilation errors or does not exist: Please fix and refresh");
+                util.printString(doc.location + " contains compilation errors or does not exist: Please fix and refresh", "csr-bold csr-error");
+                doc.content = null;
             },
             async: false
         });
@@ -388,15 +390,26 @@ function CodeBlock(code, line) {
 CodeBlock.prototype = {
 
     initialize: function (code, line) {
-        this.code = '<pre><div class="code"><code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
+        if (code) {
+            this.code = '<pre><div class="code"><code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
+        }
+        else {
+            this.code = '<pre><div class="code">';
+        }
     },
 
     add: function (code, line) {
-        this.code = this.code + '<br /><code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
+        if (this.code == '<pre><div class="code">') {
+            this.code = this.code + '<code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
+        }
+        else {
+            this.code = this.code + '<br /><code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
+        }
+
     },
 
     clear: function () {
-        this.code = "";
+        this.code = '<pre><div class="code">';
     },
 
     setSpaces: function (line) {
@@ -434,7 +447,7 @@ var util = {
 
     printError: function (lineNum, e) {
         var s = "Error found at line " + lineNum + ": " + e;
-        util.printString(s, "error");
+        util.printString(s, "csr-error");
     },
 
     escapeHTML: function (s) {

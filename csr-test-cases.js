@@ -17,6 +17,7 @@ var csrTestCases = {
         this.addTestCase("csrIntRadixTest", null, "js");
         this.addTestCase("csrFloatRadixTest", null, "js");
         this.addTestCase("csrFallbackFontTest", null, "css");
+        this.addTestCase("csrZeroUnitTest", null, "css");
         this.addTestCase("csrAltTextTest", null, "html");
         this.addTestCase("csrScriptTest", null, "html");
     }
@@ -110,6 +111,31 @@ var csrFallbackFontTest = {
                     }
                 }
                 index = line.indexOf("font-family", k);
+            }
+        }
+    }
+
+};
+
+var csrZeroUnitTest = {
+
+    execute: function (document) {
+        var lines = document.getLines();
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            // search for 0px or 0em
+            var index = line.indexOf(":0px", 0);
+            var index2 = line.indexOf(" 0px", 0);
+            var index3 = line.indexOf(":0em", 0);
+            var index4 = line.indexOf(" 0em", 0);
+            /*var index5 = line.indexOf(":0%", 0);
+            var index6 = line.indexOf(" 0%", 0);*/
+            if (index != -1 || index2 != -1 ||
+                        index3 != -1 || index4 != -1) {
+                document.addError();
+                util.printError(i + 1, "Units unnecessarily declared when specifying zero value");
+                new CodeBlock(line.trim(), i + 1).print();
             }
         }
     }
