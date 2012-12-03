@@ -93,3 +93,12 @@ __`CodeBlock.print()`__
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prints the current CodeBlock instance to screen.
 
 _General Utility_
+
+__`util.printString(s, classes)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print string s to screen.  This function should always be used when printing to the tool output.  Parameter classes is optional and will add any specified CSS classes to the text output, e.g. to make text bold-italic specify "csr-bold csr-italic".
+
+__`util.printError(lineNumber, e)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Similar to util.printString(), prints error message e to screen.  Parameter lineNumber specifies which line the error occurred on.
+
+__`util.escapeHTML(code)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters.  This prevents the browser from trying to execute or interpret code.
