@@ -13,6 +13,7 @@ var csrTestCases = {
         window.CSREngine.addTestCase(nameSpace, location, type);
     },
 
+    // list of current test cases
     populateTestCases: function () {
         this.addTestCase("csrIntRadixTest", null, "js");
         this.addTestCase("csrFloatRadixTest", null, "js");

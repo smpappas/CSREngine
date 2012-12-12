@@ -55,6 +55,7 @@ CSREngine.prototype = {
     removeTestCase: function (nameSpace) {
     },
 
+    // add minimize/maximize button
     addToggleButtons: function () {
         $('#csr-wrapper').before('<button id="csr-button" class="csr csr-button">Minimize</button>');
 
@@ -70,35 +71,42 @@ CSREngine.prototype = {
         });
     },
 
+    // get all linked client-side documents and store them in array this.documents
     populateDocuments: function () {
         var engine = this;
         var filters = this.filters;
 
         engine.addDocument('HTML Source', 'html');
 
-        // Find all CSS documents
+        // find all CSS documents
         $('link').each(function () {
             var source = $(this).prop('href');
             var type = $(this).prop('rel');
+
+            // if document is not to be filtered out
             if (!filters.ignore(source) && type == "stylesheet") {
                 engine.addDocument(source, 'css');
             }
         });
 
-        // Find all JavaScript documents
+        // find all JavaScript documents
         $('script').each(function () {
             var source = $(this).prop('src');
             var type = $(this).prop('type');
+
+            // if document is not to be filtered out
             if (!filters.ignore(source) && source != "") {
                 engine.addDocument(source, 'js');
             }
         });
     },
 
+    // get a list of current test cases and store them into array this.testCases
     populateTestCases: function () {
         csrTestCases.populateTestCases();
     },
 
+    // go through each document and run source code through appropriate test cases
     analyzeDocuments: function () {
         for (var i = 0; i < this.documents.length; i++) {
             var doc = this.documents[i];
@@ -189,6 +197,8 @@ DocAnalysis.prototype = {
     runHtmlAnalysis: function () {
         for (var i = 0; i < window.CSREngine.testCases.length; i++) {
             var tc = window.CSREngine.testCases[i];
+
+            // execute all test cases of type html
             if (tc.type == "html") {
                 eval(tc.nameSpace + ".execute(this.document)");
             }
@@ -198,6 +208,8 @@ DocAnalysis.prototype = {
     runCssAnalysis: function () {
         for (var i = 0; i < window.CSREngine.testCases.length; i++) {
             var tc = window.CSREngine.testCases[i];
+
+            // execute all test cases of type css
             if (tc.type == "css") {
                 eval(tc.nameSpace + ".execute(this.document)");
             }
@@ -207,6 +219,8 @@ DocAnalysis.prototype = {
     runJsAnalysis: function () {
         for (var i = 0; i < window.CSREngine.testCases.length; i++) {
             var tc = window.CSREngine.testCases[i];
+
+            // execute all test cases of type js
             if (tc.type == "js") {
                 eval(tc.nameSpace + ".execute(this.document)");
             }
@@ -282,6 +296,7 @@ Document.prototype = {
         console.log(this.content);
     },
 
+    // try to locate document and pull source code
     readContent: function () {
         var URL = this.getLocation();
         var ready = false;
@@ -290,9 +305,11 @@ Document.prototype = {
         $.ajax({
             url: URL,
             success: function (data) {
+                // document was found
                 doc.content = data;
             },
             error: function () {
+                // document was not found or contains compilation errors
                 console.log(doc.location + " contains compilation errors or does not exist: Please fix and refresh");
                 util.printString(doc.location + " contains compilation errors or does not exist: Please fix and refresh", "csr-bold csr-error");
                 doc.content = null;
@@ -301,6 +318,7 @@ Document.prototype = {
         });
     },
 
+    // returns an array of lines of the document so that line by line traversal can be done
     getLines: function () {
         return this.getContent().split('\n');
     },
@@ -333,6 +351,7 @@ Filters.prototype = {
 
     getFilters: function () { return this.filters; },
 
+    // determine if source file should be ignored by analysis
     ignore: function (source) {
         source = source.toLowerCase();
         for (var i = 0; i < this.filters.length; i++) {
@@ -406,10 +425,12 @@ CodeBlock.prototype = {
 
     },
 
+    // clear the current code block
     clear: function () {
         this.code = '<div class="csr-pre"><div class="csr-code">';
     },
 
+    // ensure that every line of code lines up no matter what line number
     setSpaces: function (line) {
         var spaces;
         if (line < 10)
@@ -423,6 +444,7 @@ CodeBlock.prototype = {
         return spaces;
     },
 
+    // print the current code block
     print: function () {
         var code = this.code;
         $('#csr-wrapper').append(code + '</div></div>');
@@ -448,6 +470,7 @@ var util = {
         util.printString(s, "csr-error");
     },
 
+    // used for displaying HTML source code
     escapeHTML: function (s) {
         return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
