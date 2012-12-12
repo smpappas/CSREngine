@@ -43,7 +43,20 @@ By default, common third-party libraries and frameworks, such as jQuery, MooTool
 
 __Files__
 
+`csr-engine.js` - Contains all classes and code relevant to the core functionality of the engine.<br />
+`csr-test-cases.js` - Contains the implementation of all test cases, as well as a list of all test cases to be run.<br />
+`csr-engine.css` - Contains all styling for the engine.
+
 __Hosting the Engine__
+
+The engine is currently hosted at: http://www.columbia.edu/~smp2183/csr-engine/js/csr-engine.js
+
+To host the engine on a different server, each file needs to be uploaded to that server.  As explained above, the `<script>` tag in the Web page should link to the location of csr-engine.js.  In addition, csr-engine.js must be updated as described below.
+
+The CSREngine class contains two members called styleSheetLocation and testCaseLocation.  Update the following lines to contain the paths to each of these files, respectively.  These locations are defined toward the beginning of the file.
+
+    this.styleSheetLocation = "path/to/csr-engine.css";
+    this.testCaseLocation = "path/to/csr-test-cases.js";
 
 __Adding a New Test Case__
 
@@ -115,15 +128,43 @@ __`util.escapeHTML(code)`__
 
 __Filters__
 
+The Filters class in csr-engine.js specifies files that will not be analyzed.  The function `initialize()` contains a number of lines similar to the following.
+
+    this.filters.push("csr-engine");
+    
+This line will filter out all CSS and JS files where the file name contains "csr-engine", e.g. csr-engine-xxx.js.  To add new filtered files, simply add new lines in the `initialize()` function.  To remove filtered files, simply remove or comment out the appropriate lines.
+
 --
 
 ### Extensibility
 
 __Filters__
 
+The filters class currently filters out all files where the file name contains a substring as specified in `this.filters.push(substring)`.  A case may exist where the user wants to filter out some files that match this substring, but analyze others as normal.
+For example, it is likely that files named 'jquery-xxx' should be filtered out, but a user may make a custom extension called 'jquery-custom-extension-xxx'.  The Filters class could be expanded to allow the user to designate specific files that should not be filtered out, allowing user created files such as this to be analyzed.
+
 __Options__
 
+Though options have not been implemented yet, a number of options should be available to users in the future.  These options could be specified in the initialization script on the page, which might look similar to the following.
+
+    <script type="text/javascript">
+        $(function () {
+            var options = { /* insert all options here */ };
+            CSREngine.initialize(options);
+        });
+    </script>
+    
+(i) Console Printing - Currently, the engine outputs all results above the current page.  This is specified in the line `CSREngine.initialize(false)`.  The user has the option of instead printing all results to the JavaScript console by specifying `CSREngine.initialize(true)`, making the output a bit less obtrusive.
+
+Although this functionality is not yet implemented, the member function `runConsole()` in the CSREngine class is a jumping off point.  Likely, all utility functions and member functions of the CodeBlock class will have to take this condition into account in order to print to console instead of to the Web page.
+
+(ii) Filters - As described above, the user needs a way to designate specific files that will always be analyzed, as well as files that should not be analyzed and are not part of the default filters.  These files should be made a part of the user options when initializing the CSREngine.
+
 __Test Cases__
+
+Currently, all test cases are located in the file csr-test-cases.js.  In the future, it may be the case that multiple developers are working on test cases concurrently.  To avoid csr-test-cases.js being edited by all test case developers, ideally test cases will be split out into multiple files.
+
+Initial attempts to divide test cases into multiple files created issues, so all test cases were moved into csr-test-cases.js for the time being.
 
 --
 
