@@ -22,6 +22,8 @@ $(function () {
 function CSREngine() {
 
     this.consolePrint = false;
+    this.styleSheetLocation = "http://www.columbia.edu/~smp2183/csr-engine/css/csr-engine.css";
+    this.testCaseLocation = "http://www.columbia.edu/~smp2183/csr-engine/js/csr-test-cases.js";
     this.documents = new Array();
     this.testCases = new Array();
     this.filters = new Filters();
@@ -95,13 +97,6 @@ CSREngine.prototype = {
 
     populateTestCases: function () {
         csrTestCases.populateTestCases();
-
-        // for each test case, add a link to the js file
-        /*for (var i = 0; i < this.testCases.length;  i++) {
-            var tc = this.testCases[i];
-            console.log('<script src="' + tc.location + '" type="text/javascript"></script>');
-            $('head').append('<script src="' + tc.location + '" type="text/javascript"></script>');
-        }*/
     },
 
     analyzeDocuments: function () {
@@ -116,24 +111,47 @@ CSREngine.prototype = {
 
     test: function () {
         /*** TEST AREA **/
+    },
 
-        /*util.printString("Error found at line 9 of document.js:");
-        var s = 'console.log("trial code");';
-        var codeBlock = new CodeBlock(s, 9);
-        codeBlock.add(s, 10);
-        codeBlock.add('     ' + s, 11);
-        codeBlock.add(s, 12);
-        codeBlock.print();*/
+    runNormal: function () {
+        var engine = this;
 
-        /*util.printString("Error found at line 123 of document.js:");
-        s = 'x = parseInt(s);';
-        var codeBlock = new CodeBlock(s, 123);
-        codeBlock.print();*/
+        // Add CSR Engine stylesheet and create section before the body
+        $('head').append('<link rel="stylesheet" href="' + engine.styleSheetLocation + '" type="text/css" />');
+        $.getScript(engine.testCaseLocation, function () {
+            $('body').before('<section id="csr-wrapper" class="csr"></section>');
 
-        for (var i = 0; i < this.documents.length; i++) {
-            //this.documents[i].printContent();
-            //this.printCode(this.documents[i].getContent());
-        }
+            engine.addToggleButtons();
+
+            // Print introduction message
+            $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
+
+            // Populate array of linked client-side documents
+            engine.populateDocuments();
+            engine.populateTestCases();
+            engine.analyzeDocuments();
+
+            engine.test();
+        });
+    },
+
+    runConsole: function () {
+        var engine = this;
+
+        // Add CSR Engine stylesheet
+        $('head').append('<link rel="stylesheet" href="' + engine.styleSheetLocation + '" type="text/css" />');
+        $.getScript(engine.testCaseLocation, function () {
+            // This option does not print much at the moment
+            console.log('Client-Side Reliability Engine');
+            console.log('   Enter the dragon.');
+
+            // Populate array of linked client-side documents
+            engine.populateDocuments();
+            engine.populateTestCases();
+            engine.analyzeDocuments();
+
+            engine.test();
+        });
     },
 
     // Public functions
@@ -145,32 +163,11 @@ CSREngine.prototype = {
 
         // User has chosen to print to JavaScript console instead of within the page
         if (this.consolePrint) {
-            // This option does not print much at the moment
-            console.log('Client-Side Reliability Engine');
-            console.log('   Enter the dragon.');
+            this.runConsole();
         }
         // By default, results will be displayed as part of the current page
         else {
-            // Add CSR Engine stylesheet and create section before the body
-            // HARD CODE
-            $('head').append('<link rel="stylesheet" href="http://www.columbia.edu/~smp2183/csr-engine/css/csr-engine.css" type="text/css" />');
-            var engine = this;
-            $.getScript("http://www.columbia.edu/~smp2183/csr-engine/js/csr-test-cases.js", function () {
-                $('body').before('<section id="csr-wrapper" class="csr"></section>');
-
-                engine.addToggleButtons();
-
-                // Print introduction message
-                $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
-                //$('#csr-wrapper').append('<div>Enter the dragon.</div>');
-
-                // Populate array of linked client-side documents
-                engine.populateDocuments();
-                engine.populateTestCases();
-                engine.analyzeDocuments();
-
-                engine.test();
-            });
+            this.runNormal();
         }
 
     }
@@ -351,6 +348,7 @@ Filters.prototype = {
 
         // Add standard third party files to ignore - move this list to a separate file/database later
         this.filters.push("csr-engine");
+        this.filters.push("csr-test-cases");
         this.filters.push("agility");
         this.filters.push("angular");
         this.filters.push("backbone");
