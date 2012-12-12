@@ -170,16 +170,107 @@ Initial attempts to divide test cases into multiple files created issues, so all
 
 ### Class Reference
 
-___CSREngine___
+Class descriptions and primary member functions listed below.
 
-___DocAnalysis___
+___CSREngine Class___
 
-___TestCase___
+Used to create an instance of the engine where code execution begins.
 
-___Document___
+__`CSREngine.initialize()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kicks off the engine analysis.
 
-___Filters___
+__`CSREngine.runNormal()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Run analysis with option to print results above Web page.
 
-___CodeBlock___
+__`CSREngine.runConsole()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Run analysis with option priont results to JavaScript console.
+
+<b>`CSREngine.populateDocuments()`</b>
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Search HTML source for `<link>` and `<script>` tags to populate array CSREngine.documents with all linked client-side files.
+
+<b>`CSREngine.populateTestCases()`</b>
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calls function `csrTestCases.populateTestCases()` located in csr-test-cases.js to populate an array of all current test cases.
+
+__`CSREngine.analyzeDocuments()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creates and instance of DocAnalysis class for each linked client-side document and kicks off analysis on that document.
+
+___DocAnalysis Class___
+
+Used to run analysis on a particular document.
+
+__`DocAnalysis.runAnalysis()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Entry point for running analysis on a document.  Calls one of the below functions depending on the type of the document contained in the instance of the class.
+
+__`DocAnalysis.runHtmlAnalysis()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Runs all HTML test cases on the document.
+
+__`DocAnalysis.runCssAnalysis()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Runs all CSS test cases on the document.
+
+__`DocAnalysis.runJsAnalysis()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Runs all JavaScript test cases on the document.
+
+___TestCase Class___
+
+Contains information about a test case including its type and where the implementation is located.
+
+___Document Class___
+
+Contains information about a document (file) including its location, type, and source code.
+
+__`Document.getLines()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns an array that consists of the document split into lines.  This allows traversal of the document line by line using a __for__ loop or similar.
+
+__`Document.addError()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Should be called when an error is found in document.  This is used to track the number of errors found in each document.
+
+__`Document.readContent()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Performs and AJAX request to locate the document.  If the document is found, the source code is assigned to class member content'.
+
+__`Document.getContent()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the source code of the document contained in class member 'content'.
+
+__`Document.printContent()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prints the source code of the document to the JavaScript console.  This is mostly used for debugging.
+
+___Filters Class___
+
+Used to create document filters to specify which documents should and should not be analyzed.
+
+__`Filters.initialize()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defines the default filters and pushes them onto an array held in class member 'filters'.
+
+__`Filters.getFilters()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns an array of all filters held in class member 'filters'.
+
+__`Filters.ignore(source)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Takes in a file name/location and returns true if the file should be ignored during the analysis, false otherwise.
+
+___CodeBlock Class___
+
+Used to create a block or line of code to be printed to screen.
+
+__`CodeBlock(code, lineNumber)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Initialize a new CodeBlock instance with code found at lineNumber.  Parameters code and lineNumber are optional, and CodeBlock will be initialized to be empty if not specified.
+
+__`CodeBlock.add(code, lineNumber)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adds code found at lineNumber to current CodeBlock instance.  This can be used to create a single-line code block when the current instance is empty, or used to create multiline code blocks by calling this function on sequential lines of code.
+
+__`CodeBlock.clear()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Empties the current CodeBlock instance.  New code can be added to the existing code block through CodeBlock.add().
+
+__`CodeBlock.print()`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prints the current CodeBlock instance to screen.
 
 ___util (Utility Namespace)___
+
+Contains a number of utility and helper functions for use in implementing core functionality and test cases.
+
+__`util.printString(s, classes)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print string s to screen.  This function should always be used when printing to the tool output.  Parameter classes is optional and will add any specified CSS classes to the text output, e.g. to make text bold-italic specify "csr-bold csr-italic".
+
+__`util.printError(lineNumber, e)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Similar to util.printString(), prints error message e to screen.  Parameter lineNumber specifies which line the error occurred on.
+
+__`util.escapeHTML(code)`__
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters.  This prevents the browser from trying to execute or interpret code.
