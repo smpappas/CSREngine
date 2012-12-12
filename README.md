@@ -31,11 +31,19 @@ This script block initializes the Client-Side Reliability Engine and runs an ana
 
 __Options__
 
-Options are not currently implemented, but the intention is to allow users to customize their experience.  In the future, users should be able to designate (i) specific files that should NOT be filtered out, and (ii) whether to output to the web page or JavaScript console.
+Options are not currently implemented, but the intention is to allow users to customize their experience.  In the future, users should be able to designate (i) specific files that should NOT be filtered out, and (ii) whether to output results to the web page or JavaScript console.
 
---
+__Filters__
+
+By default, common third-party libraries and frameworks, such as jQuery, MooTools, and backbone.js, are not analyzed by the engine.  Adding and removing files from the filter is discussed further in the Developer section.
+
+---
 
 ### Developers
+
+__Files__
+
+__Hosting the Engine__
 
 __Adding a New Test Case__
 
@@ -104,3 +112,33 @@ __`util.printError(lineNumber, e)`__
 
 __`util.escapeHTML(code)`__
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters.  This prevents the browser from trying to execute or interpret code.
+
+__Filters__
+
+--
+
+### Extensibility
+
+__Filters__
+
+__Options__
+
+__Test Cases__
+
+--
+
+### Class Reference
+
+___CSREngine___
+
+___DocAnalysis___
+
+___TestCase___
+
+___Document___
+
+___Filters___
+
+___CodeBlock___
+
+___util (Utility Namespace)___
