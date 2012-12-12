@@ -1,6 +1,10 @@
 Client-Side Reliability Engine
 ==============================
 
+The Client-Side Reliability Engine provides feedback on common bugs associated with HTML, CSS, and JavaScript code.  The engine helps to ensure that best practices are being employed to improve reliability and reduce the chance of undesired results.
+
+### Users
+
 __Dependencies__
 
 The Client-Side Reliability Engine makes use of jQuery and requires version 1.6 or higher.  For more information on jQuery, visit http://www.jquery.com.
@@ -27,7 +31,7 @@ This script block initializes the Client-Side Reliability Engine and runs an ana
 
 __Options__
 
-Options to come soon.
+Options are not currently implemented, but the intention is to allow users to customize their experience.  In the future, users should be able to designate (i) specific files that should NOT be filtered out, and (ii) whether to output to the web page or JavaScript console.
 
 --
 
@@ -44,11 +48,9 @@ New test cases can be added into the file csr-test-cases.js.  Existing test case
 2.  Create a namespace for the test case and an execute function.  The format should be similar to below.
 
     <pre><code>var csrNamespaceOfTestCase = {
-
+    
         execute: function (document) {
-        
             // Test body goes here
-            
         }
         
     };</code></pre>
