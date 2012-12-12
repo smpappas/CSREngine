@@ -391,25 +391,25 @@ CodeBlock.prototype = {
 
     initialize: function (code, line) {
         if (code) {
-            this.code = '<pre><div class="code"><code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
+            this.code = '<div class="csr-pre"><div class="csr-code"><span class="csr-code-inner"><span class="csr-code-line">' + line + this.setSpaces(line) + '</span>' + code + '</span>';
         }
         else {
-            this.code = '<pre><div class="code">';
+            this.code = '<div class="csr-pre"><div class="csr-code">';
         }
     },
 
     add: function (code, line) {
-        if (this.code == '<pre><div class="code">') {
-            this.code = this.code + '<code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
+        if (this.code == '<div class="csr-pre"><div class="csr-code">') {
+            this.code = this.code + '<span class="csr-code-inner"><span class="csr-code-line">' + line + this.setSpaces(line) + '</span>' + code + '</span>';
         }
         else {
-            this.code = this.code + '<br /><code><span class="code-line">' + line + this.setSpaces(line) + '</span>' + code + '</code>';
+            this.code = this.code + '<br /><span class="csr-code-inner"><span class="csr-code-line">' + line + this.setSpaces(line) + '</span>' + code + '</span>';
         }
 
     },
 
     clear: function () {
-        this.code = '<pre><div class="code">';
+        this.code = '<div class="csr-pre"><div class="csr-code">';
     },
 
     setSpaces: function (line) {
@@ -427,7 +427,7 @@ CodeBlock.prototype = {
 
     print: function () {
         var code = this.code;
-        $('#csr-wrapper').append(code + '</div></pre>');
+        $('#csr-wrapper').append(code + '</div></div>');
     }
 
 };

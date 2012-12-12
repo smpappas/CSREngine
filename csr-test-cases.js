@@ -16,10 +16,12 @@ var csrTestCases = {
     populateTestCases: function () {
         this.addTestCase("csrIntRadixTest", null, "js");
         this.addTestCase("csrFloatRadixTest", null, "js");
+        this.addTestCase("csrTypeWrapperTest", null, "js");
         this.addTestCase("csrFallbackFontTest", null, "css");
         this.addTestCase("csrZeroUnitTest", null, "css");
         this.addTestCase("csrAltTextTest", null, "html");
         this.addTestCase("csrScriptTest", null, "html");
+        this.addTestCase("csrOnClickTest", null, "html");
     }
 
 };
@@ -33,7 +35,8 @@ var csrIntRadixTest = {
 
             // search for parseInt() without a radix specified
             var index = line.indexOf("parseInt", 0);
-            while (index != -1) {
+            var errorFound = false;
+            while (index != -1 && !errorFound) {
                 var code = "";
                 var j = index;
                 var k = line.indexOf(")", j);
@@ -47,6 +50,7 @@ var csrIntRadixTest = {
                     if (code != "") {
                         util.printError(i + 1, "No radix specified");
                         new CodeBlock(line.trim(), i + 1).print();
+                        errorFound = true;
                     }
                 }
                 index = line.indexOf("parseInt", index + 1);
@@ -65,7 +69,8 @@ var csrFloatRadixTest = {
 
             // search for parseFloat() with a radix specified
             var index = line.indexOf("parseFloat", 0);
-            while (index != -1) {
+            var errorFound = false;
+            while (index != -1 && !errorFound) {
                 var code = "";
                 var j = index;
                 var k = line.indexOf(")", j);
@@ -79,6 +84,7 @@ var csrFloatRadixTest = {
                     if (code != "") {
                         util.printError(i + 1, "Radix is not necessary for parseFloat() as second parameter");
                         new CodeBlock(line.trim(), i + 1).print();
+                        errorFound = true;
                     }
                 }
                 index = line.indexOf("parseInt", index + 1);
@@ -97,7 +103,8 @@ var csrFallbackFontTest = {
 
             // search for font-family or font properties
             var index = line.indexOf("font-family", 0);
-            while (index != -1) {
+            var errorFound = false;
+            while (index != -1 && !errorFound) {
                 var j = index;
                 var k = line.indexOf(';');
                 var c = line.indexOf(',');
@@ -108,6 +115,7 @@ var csrFallbackFontTest = {
                         document.addError();
                         util.printError(i + 1, "No fallback fonts specified in font-family property");
                         new CodeBlock(line.trim(), i + 1).print();
+                        errorFound = true;
                     }
                 }
                 index = line.indexOf("font-family", k);
@@ -151,7 +159,8 @@ var csrAltTextTest = {
 
             // search for img tags
             var index = line.indexOf("<img", 0);
-            while (index != -1) {
+            var errorFound = false;
+            while (index != -1 && !errorFound) {
                 var j = index;
                 var k = line.indexOf(">", j);
                 var a = line.indexOf("alt", j);
@@ -159,6 +168,7 @@ var csrAltTextTest = {
                     document.addError();
                     util.printError(i + 2, "No alt text specified for image");
                     new CodeBlock(util.escapeHTML(line.trim()), i + 2).print();
+                    errorFound = true;
                 }
                 index = line.indexOf("<img", k);
             }
@@ -176,7 +186,8 @@ var csrScriptTest = {
 
             // search for img tags
             var index = line.indexOf("<script", 0);
-            while (index != -1) {
+            var errorFound = false;
+            while (index != -1 && !errorFound) {
                 var j = index;
                 var k = line.indexOf(">", j);
                 var a = line.indexOf("type", j);
@@ -184,8 +195,65 @@ var csrScriptTest = {
                     document.addError();
                     util.printError(i + 2, "No script type specified");
                     new CodeBlock(util.escapeHTML(line.trim()), i + 2).print();
+                    errorFound = true;
                 }
                 index = line.indexOf("<script", k);
+            }
+        }
+    }
+
+};
+
+var csrOnClickTest = {
+
+    execute: function (document) {
+        var lines = document.getLines();
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            // search for onclick events
+            var index = line.indexOf("onclick=", 0);
+            var errorFound = false;
+            while (index != -1 && !errorFound) {
+                document.addError();
+                util.printError(i + 2, "Please do not use 'onclick' to attach click events; attach events in JavaScript files");
+                new CodeBlock(util.escapeHTML(line.trim()), i + 2).print();
+                index = line.indexOf("onclick=", index + 1);
+                errorFound = true;
+            }
+        }
+    }
+
+};
+
+var csrTypeWrapperTest = {
+
+    findIndex: function (line, index) {
+        var i1 = line.indexOf("new Boolean(", index);
+        var i2 = line.indexOf("new String(", index);
+        var i3 = line.indexOf("new Number(", index);
+
+        var index = i1;
+        if ((i2 < index && i2 != -1) || index == -1) {
+            index = i2;
+        }
+        if ((i3 < index && i3 != -1) || index == -1) {
+            index = i3;
+        }
+        return index;
+    },
+
+    execute: function (document) {
+        var lines = document.getLines();
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            // search for inappropriate type wrapper objects
+            var index = this.findIndex(line, 0);
+            if (index != -1) {
+                document.addError();
+                util.printError(i + 1, "Avoid type wrapper objects when possible");
+                new CodeBlock(util.escapeHTML(line.trim()), i + 1).print();
             }
         }
     }
