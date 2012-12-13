@@ -76,6 +76,12 @@
 
 <p>By default, common third-party libraries and frameworks, such as jQuery, MooTools, and backbone.js, are not analyzed by the engine.  Adding and removing files from the filter is discussed further in the Developers section.</p>
 
+<p><strong>Test Cases</strong></p>
+
+<p>The Client-Side Reliability Engine runs a series of test cases on each client-side file to determine if any issues exist.  These tests perform static code analysis on each file, meaning no code within the file is actually executed.</p>
+
+<p>Each test case is designated a type, which determines which files the test applies to.  A list of currently implemented test cases is shown below along with the file type the test is associated with.</p>
+
 <hr><h3>Developers</h3>
 
 <p><strong>Files</strong></p>
@@ -175,7 +181,7 @@ for (var i = 0; i &lt; lines.length; i++) {
 
 <p>This line will filter out all CSS and JS files where the file name contains "csr-engine", e.g. csr-engine-xxx.js.  To add new filtered files, simply add new lines in the <code>initialize()</code> function.  To remove filtered files, simply remove or comment out the appropriate lines.</p>
 
-<hr><h3>Extensibility</h3>
+<hr><h3>Extensibility / Open Issues</h3>
 
 <p><strong>Filters</strong></p>
 
