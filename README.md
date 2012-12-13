@@ -37,6 +37,22 @@ __Filters__
 
 By default, common third-party libraries and frameworks, such as jQuery, MooTools, and backbone.js, are not analyzed by the engine.  Adding and removing files from the filter is discussed further in the Developer section.
 
+__Test Cases__
+
+The Client-Side Reliability Engine runs a series of test cases on each client-side file to determine if any issues exist. These tests perform static code analysis on each file, meaning no code within the file is actually executed.
+
+Each test case is designated a type, which determines which files the test applies to. A list of currently implemented test cases is shown below along with the file type the test is associated with.
+
+    Missing alternative text for images                         -   HTML
+    Missing script type                                         -   HTML
+    Using 'onclick' to attach a JavaScript event handler        -   HTML
+    Defining units for zero values                              -   CSS
+    Not specifying fallback fonts, i.e. no font stack           -   CSS
+    Not specifying a radix when converting strings to integers  -   JavaScript
+    Specifying a radix when converting strings to floats        -   JavaScript
+    Using type wrapper objects inappropriately                  -   JavaScript
+<br />
+
 ---
 
 ### Developers
