@@ -208,7 +208,7 @@ __`CSREngine.runConsole()`__
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calls function `csrTestCases.populateTestCases()` located in csr-test-cases.js to populate an array of all current test cases.
 
 __`CSREngine.analyzeDocuments()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creates and instance of DocAnalysis class for each linked client-side document and kicks off analysis on that document.
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creates an instance of DocAnalysis class for each linked client-side document and kicks off analysis on that document.
 
 ___DocAnalysis Class___
 
