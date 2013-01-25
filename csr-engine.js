@@ -22,8 +22,8 @@ $(function () {
 function CSREngine() {
 
     this.consolePrint = false;
-    this.styleSheetLocation = "http://www.columbia.edu/~smp2183/csr-engine/css/csr-engine.css";
-    this.testCaseLocation = "http://www.columbia.edu/~smp2183/csr-engine/js/csr-test-cases.js";
+    this.styleSheetLocation = "http://www.steve-pappas.com/staticsmp/csr-engine/css/csr-engine.css";
+    this.testCaseLocation = "http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-test-cases.js";
     this.documents = new Array();
     this.testCases = new Array();
     this.filters = new Filters();
