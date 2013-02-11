@@ -65,7 +65,7 @@ __Files__
 
 __Hosting the Engine__
 
-The engine is currently hosted at: http://www.columbia.edu/~smp2183/csr-engine/js/csr-engine.js
+The engine is currently hosted at: http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js
 
 To host the engine on a different server, each file needs to be uploaded to that server.  As explained above, the `<script>` tag in the Web page should link to the location of csr-engine.js.  In addition, csr-engine.js must be updated as described below.
 
