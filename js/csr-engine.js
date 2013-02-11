@@ -105,6 +105,21 @@ CSREngine.prototype = {
     populateTestCases: function () {
         csrTestCases.populateTestCases();
     },
+    
+    populateOptions: function () {
+    	$('#csr-options-panel').append('<h2>CSR Options</h2>');
+    	$('#csr-options-panel').append('<p>Options will go here</p>');
+    	$('#csr-options-panel').append('<p>Option 1</p>');
+    	$('#csr-options-panel').append('<p>Option 2</p>');
+    	$('#csr-options-panel').append('<p>Option 3</p>');
+    	$('#csr-options-panel').append('<p>Option 4</p>');
+    	$('#csr-options-panel').append('<p>Option 5</p>');
+    	$('#csr-options-panel').append('<p>Option 6</p>');
+    	$('#csr-options-panel').append('<p>Option 7</p>');
+    	$('#csr-options-panel').append('<p>Option 8</p>');
+    	$('#csr-options-panel').append('<p>Option 9</p>');
+    	$('#csr-options-panel').append('<p>Option 10</p>');
+    },
 
     // go through each document and run source code through appropriate test cases
     analyzeDocuments: function () {
@@ -128,6 +143,7 @@ CSREngine.prototype = {
         $('head').append('<link rel="stylesheet" href="' + engine.styleSheetLocation + '" type="text/css" />');
         $.getScript(engine.testCaseLocation, function () {
             $('body').before('<section id="csr-wrapper" class="csr"></section>');
+            $('#csr-wrapper').append('<div id="csr-options-panel"></div>')
 
             engine.addToggleButtons();
 
@@ -137,6 +153,7 @@ CSREngine.prototype = {
             // Populate array of linked client-side documents
             engine.populateDocuments();
             engine.populateTestCases();
+            engine.populateOptions();
             engine.analyzeDocuments();
 
             engine.test();
@@ -164,10 +181,26 @@ CSREngine.prototype = {
 
     // Public functions
 
-    initialize: function (consolePrint) {
+    initialize: function (options) {
 
-        this.consolePrint = consolePrint;
+        // Parse user options
+        if (options.consolePrint)
+        	this.consolePrint = options.consolePrint;
+        else
+        	this.consolePrint = false;
         this.htmlSource = $('html').html();
+        
+        if (options.filters) {
+	        for (var i=0; i<options.filters.length; i++) {
+	        	this.filters.addFilter(options.filters[i]);
+	        }
+	    }
+	    
+	    if (options.noFilters) {
+	        for (var i=0; i<options.noFilters.length; i++) {
+	        	this.filters.addNoFilter(options.noFilters[i]);
+	        }
+	    }
 
         // User has chosen to print to JavaScript console instead of within the page
         if (this.consolePrint) {
@@ -342,6 +375,7 @@ Document.prototype = {
 function Filters() {
 
     this.filters = new Array();
+    this.noFilters = new Array();
 
     this.initialize();
 
@@ -354,6 +388,11 @@ Filters.prototype = {
     // determine if source file should be ignored by analysis
     ignore: function (source) {
         source = source.toLowerCase();
+        for (var i = 0; i < this.noFilters.length; i++) {
+            if (source.indexOf(this.noFilters[i].toLowerCase()) >= 0) {
+                return false;
+            }
+        }
         for (var i = 0; i < this.filters.length; i++) {
             if (source.indexOf(this.filters[i].toLowerCase()) >= 0) {
                 return true;
@@ -362,33 +401,41 @@ Filters.prototype = {
 
         return false;
     },
+    
+    addFilter: function (filter) {
+    	this.filters.push(filter);
+    },
+	
+	addNoFilter: function (filter) {
+		this.noFilters.push(filter);
+	},
 
     initialize: function () {
 
         // Add standard third party files to ignore - move this list to a separate file/database later
-        this.filters.push("csr-engine");
-        this.filters.push("csr-test-cases");
-        this.filters.push("agility");
-        this.filters.push("angular");
-        this.filters.push("backbone");
-        this.filters.push("batman");
-        this.filters.push("coffee-script");
-        this.filters.push("dojo");
-        this.filters.push("ember");
-        this.filters.push("jquery");
-        this.filters.push("knockback");
-        this.filters.push("knockout");
-        this.filters.push("less");
-        this.filters.push("mochikit");
-        this.filters.push("midori");
-        this.filters.push("mootools");
-        this.filters.push("prototype");
-        this.filters.push("qooxdoo");
-        this.filters.push("scriptaculous");
-        this.filters.push("spine");
-        this.filters.push("underscore");
-        this.filters.push("yui");
-        this.filters.push("google");
+        this.addFilter("csr-engine");
+        this.addFilter("csr-test-cases");
+        this.addFilter("agility");
+        this.addFilter("angular");
+        this.addFilter("backbone");
+        this.addFilter("batman");
+        this.addFilter("coffee-script");
+        this.addFilter("dojo");
+        this.addFilter("ember");
+        this.addFilter("jquery");
+        this.addFilter("knockback");
+        this.addFilter("knockout");
+        this.addFilter("less");
+        this.addFilter("mochikit");
+        this.addFilter("midori");
+        this.addFilter("mootools");
+        this.addFilter("prototype");
+        this.addFilter("qooxdoo");
+        this.addFilter("scriptaculous");
+        this.addFilter("spine");
+        this.addFilter("underscore");
+        this.addFilter("yui");
+        this.addFilter("google");
 
     }
 

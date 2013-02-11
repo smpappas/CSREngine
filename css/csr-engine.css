@@ -7,17 +7,19 @@
 *
 */
 
+@import url(http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700,300italic,400italic,500italic,700italic);
+
 #csr-wrapper {
     border-bottom: 1px solid #757575;
     margin: 0;
     max-height: 288px;
     overflow: auto;
-    padding: 0 12px 8px 12px;
+    padding: 4px 12px 8px 12px;
 }
 
 .csr {
     background-color: #EAEAEA;
-    font-family: 'Segoe UI', Helevetica, sans-serif;
+    font-family: 'Ubuntu', Helevetica, sans-serif;
     font-size: 12px;
     font-weight: normal;
 }
@@ -26,7 +28,7 @@
 .csr h2 { font-size: 16px; margin: 2px 0 2px 0; }
 .csr h3 { font-size: 14px; margin: 2px 0 2px 0; }
 
-.csr-bold { font-weight: bold; }
+.csr-bold { font-weight: medium; }
 .csr-italic { font-style: italic; }
 
 .csr-button {
@@ -43,6 +45,19 @@
 }
 
 .csr-button:hover, .csr-button:active { border-color: #A0A0A0; }
+
+#csr-options-panel {
+	background-color: #CACACA;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	float: right;
+	margin: 12px 4px 16px 16px;
+	/*max-height: 232px;
+	overflow: auto;*/
+	padding: 16px;
+	width: 200px;
+}
 
 .csr-pre {
     color: #1874CD;
