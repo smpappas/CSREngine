@@ -21,14 +21,19 @@ $(function () {
 
 function CSREngine() {
 
-    this.consolePrint = false;
     this.styleSheetLocation = "http://www.steve-pappas.com/staticsmp/csr-engine/css/csr-engine.css";
     this.testCaseLocation = "http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-test-cases.js";
-    this.documents = new Array();
-    this.testCases = new Array();
-    this.filters = new Filters();
+    this.documents = [];
+    this.testCases = [];
     this.htmlSource;
     this.tcDone = false;
+    
+    // Options
+    this.consolePrint = false;
+    this.filters = new Filters();
+    this.runHtml = true;
+    this.runCss = true;
+    this.runJavascript = true;
 
 }
 
@@ -107,33 +112,55 @@ CSREngine.prototype = {
     },
     
     populateOptions: function () {
-    	$('#csr-options-panel').append('<h2>CSR Options</h2>');
-    	$('#csr-options-panel').append('<p>Options will go here</p>');
-    	$('#csr-options-panel').append('<p>Option 1</p>');
-    	$('#csr-options-panel').append('<p>Option 2</p>');
-    	$('#csr-options-panel').append('<p>Option 3</p>');
-    	$('#csr-options-panel').append('<p>Option 4</p>');
-    	$('#csr-options-panel').append('<p>Option 5</p>');
-    	$('#csr-options-panel').append('<p>Option 6</p>');
-    	$('#csr-options-panel').append('<p>Option 7</p>');
-    	$('#csr-options-panel').append('<p>Option 8</p>');
-    	$('#csr-options-panel').append('<p>Option 9</p>');
-    	$('#csr-options-panel').append('<p>Option 10</p>');
+    	var engine = this;
+    	
+    	$('#csr-options-panel').append('<button id="csr-options-button" class="csr">&nbsp;APPLY&nbsp;</button>');
+    	$('#csr-options-button').click(function () {
+    		engine.applyOptions();
+    	});
+    	
+    	$('#csr-options-panel').append('<h2>Options</h2>');
+    	
+    	// Test suite options
+    	$('#csr-options-panel').append('<h3>Test Suites</h3>');
+    	$('#csr-options-panel').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-test-suite" value="csr-html">HTML</input></div>');
+    	$('#csr-options-panel').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-test-suite" value="csr-css">CSS</input></div>');
+    	$('#csr-options-panel').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-test-suite" value="csr-javascript">JavaScript</input></div>');
+    	if (this.runHtml) { $('.csr-options-checkbox[value="csr-html"]').prop('checked', true); }
+    	if (this.runCss) { $('.csr-options-checkbox[value="csr-css"]').prop('checked', true); }
+    	if (this.runJavascript) { $('.csr-options-checkbox[value="csr-javascript"]').prop('checked', true); }
     },
 
     // go through each document and run source code through appropriate test cases
     analyzeDocuments: function () {
+    	var engine = this;
+    	
         for (var i = 0; i < this.documents.length; i++) {
             var doc = this.documents[i];
             if (doc.getContent()) {
                 var docAnalysis = new DocAnalysis(doc);
-                docAnalysis.runAnalysis();
+                docAnalysis.runAnalysis(engine.runHtml, engine.runCss, engine.runJavascript);
             }
         }
     },
 
     test: function () {
         /*** TEST AREA **/
+    },
+    
+    applyOptions: function () {
+    	var engine = this;
+    	
+    	while (engine.documents.length > 0)
+    		engine.documents.pop();
+    	while (engine.testCases.length > 0)
+    		engine.testCases.pop();
+    	
+    	$('#csr-content').html('');
+    	
+    	engine.populateDocuments();
+        engine.populateTestCases();
+        engine.analyzeDocuments();
     },
 
     runNormal: function () {
@@ -149,6 +176,7 @@ CSREngine.prototype = {
 
             // Print introduction message
             $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
+            $('#csr-wrapper').append('<div id="csr-content"></div>');
 
             // Populate array of linked client-side documents
             engine.populateDocuments();
@@ -184,10 +212,9 @@ CSREngine.prototype = {
     initialize: function (options) {
 
         // Parse user options
-        if (options.consolePrint)
+        if (options.consolePrint === true)
         	this.consolePrint = options.consolePrint;
-        else
-        	this.consolePrint = false;
+        	
         this.htmlSource = $('html').html();
         
         if (options.filters) {
@@ -201,6 +228,13 @@ CSREngine.prototype = {
 	        	this.filters.addNoFilter(options.noFilters[i]);
 	        }
 	    }
+	    
+	    if (options.html === false)
+	    	this.runHtml = options.html;
+	    if (options.css === false)
+	    	this.runCss = options.css;
+	    if (options.javascript === false)
+	    	this.runJavascript = options.javascript;
 
         // User has chosen to print to JavaScript console instead of within the page
         if (this.consolePrint) {
@@ -208,7 +242,7 @@ CSREngine.prototype = {
         }
         // By default, results will be displayed as part of the current page
         else {
-            this.runNormal();
+            this.runNormal(options);
         }
 
     }
@@ -260,21 +294,27 @@ DocAnalysis.prototype = {
         }
     },
 
-    runAnalysis: function () {
-        util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold");
-
-        if (this.document.getType() === 'html') {
+    runAnalysis: function (runHtml, runCss, runJavascript) {
+        if (this.document.getType() === 'html' && runHtml) {
+        	util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold");
             this.runHtmlAnalysis();
+	        if (!this.document.getErrorCount()) {
+	            util.printString("No errors found in document");
+	        }
         }
-        else if (this.document.getType() === 'css') {
+        else if (this.document.getType() === 'css' && runCss) {
+        	util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold");
             this.runCssAnalysis();
+	        if (!this.document.getErrorCount()) {
+	            util.printString("No errors found in document");
+	        }
         }
-        else if (this.document.getType() === 'js') {
+        else if (this.document.getType() === 'js' && runJavascript) {
+        	util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold");
             this.runJsAnalysis();
-        }
-
-        if (!this.document.getErrorCount()) {
-            util.printString("No errors found in document");
+	        if (!this.document.getErrorCount()) {
+	            util.printString("No errors found in document");
+	        }
         }
     },
 
@@ -494,7 +534,7 @@ CodeBlock.prototype = {
     // print the current code block
     print: function () {
         var code = this.code;
-        $('#csr-wrapper').append(code + '</div></div>');
+        $('#csr-content').append(code + '</div></div>');
     }
 
 };
@@ -505,10 +545,10 @@ var util = {
 
     printString: function (s, classes) {
         if (classes) {
-            $('#csr-wrapper').append('<p class="' + classes + '">' + s + '</p>');
+            $('#csr-content').append('<p class="' + classes + '">' + s + '</p>');
         }
         else {
-            $('#csr-wrapper').append('<p>' + s + '</p>');
+            $('#csr-content').append('<p>' + s + '</p>');
         }
     },
 
