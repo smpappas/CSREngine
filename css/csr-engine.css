@@ -27,8 +27,8 @@
 }
 
 .csr h1 { color: #181818; font-size: 20px; font-weight: bold; margin: 4px 0 4px 0; text-shadow: 2px 2px 2px #B8B6B9; }
-.csr h2 { font-size: 18px; font-weight: bold; margin: 0 0 8px 0; }
-.csr h3 { font-size: 16px; font-weight: normal; margin: 0 0 8px 0; }
+.csr h2 { color: inherit; font-size: 18px; font-weight: bold; margin: 1px 0 8px 0; }
+.csr h3 { color: inherit; font-size: 14px; font-weight: normal; margin: 0 0 8px 0; }
 
 .csr-bold { font-weight: medium; }
 .csr-italic { font-style: italic; }
@@ -52,14 +52,13 @@
 
 #csr-options-panel {
 	background-color: #CACACA;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
 	float: right;
 	margin: 12px 4px 16px 16px;
 	/*max-height: 232px;
 	overflow: auto;*/
-	padding: 16px;
 	width: 200px;
 }
 
@@ -67,15 +66,48 @@
     float: right;
     background-color: #4A4A50;
     border-radius: 4px;
-    margin: 0;
     color: #DEDEDE;
+    margin: 0;
+    padding: 4px;
 }
 
 #csr-options-button:hover { color: #F0F0F0; }
 
 .csr-options-element { margin: 0; }
-.csr-options-checkbox { display: inline; margin-right: 4px; vertical-align: middle; }
+.csr-options-checkbox {
+	display: inline;
+	margin-right: 4px;
+	vertical-align: middle;
+}
 .csr-options-label { display: inline; vertical-align: middle; }
+
+.csr-options-title {
+	background-color: #4A4A50;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	padding: 8px 12px 4px 12px;
+}
+
+.csr-options-title h2 { color: #DEDEDE; }
+
+.csr-options-tab {
+	background-color: #CACACA;
+	float: left;
+	height: 18px;
+	padding: 8px 12px 8px 12px;
+	text-align: center;
+	width: 76px;
+}
+
+.csr-options-tab:hover { background-color: #5D5D63; color: #DEDEDE; cursor: pointer; }
+
+.csr-selected { background-color: #5D5D63; color: #DEDEDE; }
+
+.csr-options-content {
+	padding: 4px 12px 8px 12px;
+}
+
+#csr-doc-tab { display: none; }
 
 /*** ERROR AND CODE DISPLAY ***/
 
@@ -107,4 +139,4 @@
     font-weight: bold;
 }
 
-.csr-error { color: #AD0000; }
+.csr-error { color: #BD0000; }

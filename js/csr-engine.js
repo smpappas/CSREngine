@@ -23,6 +23,7 @@ function CSREngine() {
 
     this.styleSheetLocation = "http://www.steve-pappas.com/staticsmp/csr-engine/css/csr-engine.css";
     this.testCaseLocation = "http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-test-cases.js";
+    this.allDocuments = [];
     this.documents = [];
     this.testCases = [];
     this.htmlSource;
@@ -87,9 +88,12 @@ CSREngine.prototype = {
         $('link').each(function () {
             var source = $(this).prop('href');
             var type = $(this).prop('rel');
+            
+            if (source.indexOf("csr-") >= 0)
+            	return true;
 
             // if document is not to be filtered out
-            if (!filters.ignore(source) && type == "stylesheet") {
+            if (source != "" && type == "stylesheet") {
                 engine.addDocument(source, 'css');
             }
         });
@@ -98,9 +102,12 @@ CSREngine.prototype = {
         $('script').each(function () {
             var source = $(this).prop('src');
             var type = $(this).prop('type');
+            
+            if (source.indexOf("csr-") >= 0)
+            	return true;
 
             // if document is not to be filtered out
-            if (!filters.ignore(source) && source != "") {
+            if (source != "") {
                 engine.addDocument(source, 'js');
             }
         });
@@ -111,24 +118,102 @@ CSREngine.prototype = {
         csrTestCases.populateTestCases();
     },
     
+    defineOptionEvents: function () {
+    	$('#csr-test-title').addClass('csr-selected');
+    	
+    	// Implement tab functionality
+    	$('#csr-test-title').click(function () {
+    		$('#csr-doc-tab').hide();
+    		$('#csr-test-tab').show();
+    		$('#csr-doc-title').removeClass('csr-selected');
+    		$('#csr-test-title').addClass('csr-selected');
+    	});
+    	
+    	$('#csr-doc-title').click(function () {
+    		$('#csr-test-tab').hide();
+    		$('#csr-doc-tab').show();
+    		$('#csr-test-title').removeClass('csr-selected');
+    		$('#csr-doc-title').addClass('csr-selected');
+    	});
+    	
+    	// Implement select all checkboxes
+    	$('.csr-options-checkbox[name="csr-test-suite-all"]').click(function () {
+    		if ($(this).prop('checked') == true)
+    			$('.csr-options-checkbox[name="csr-test-suite"]').prop('checked', true);
+    		else
+    			$('.csr-options-checkbox[name="csr-test-suite"]').prop('checked', false);
+    	});
+    	$('.csr-options-checkbox[name="csr-document-all"]').click(function () {
+    		if ($(this).prop('checked') == true)
+    			$('.csr-options-checkbox[name="csr-document"]').prop('checked', true);
+    		else
+    			$('.csr-options-checkbox[name="csr-document"]').prop('checked', false);
+    	});
+    	
+    	$('.csr-options-checkbox[name="csr-test-suite"]').click(function () {
+    		$('.csr-options-checkbox[name="csr-test-suite-all"]').prop('checked', true);
+	    	$('.csr-options-checkbox[name="csr-test-suite"]').each(function () {
+				if ($(this).prop('checked') == false)
+					$('.csr-options-checkbox[name="csr-test-suite-all"]').prop('checked', false);
+			});
+    	});
+    	$('.csr-options-checkbox[name="csr-document"]').click(function () {
+    		$('.csr-options-checkbox[name="csr-document-all"]').prop('checked', true);
+	    	$('.csr-options-checkbox[name="csr-document"]').each(function () {
+				if ($(this).prop('checked') == false)
+					$('.csr-options-checkbox[name="csr-document-all"]').prop('checked', false);
+			});
+    	});
+    },
+    
+    // populate the options panel
     populateOptions: function () {
     	var engine = this;
     	
-    	$('#csr-options-panel').append('<button id="csr-options-button" class="csr">&nbsp;APPLY&nbsp;</button>');
+    	$('#csr-options-panel').append('<div class="csr-options-title"></div>');
+    	$('#csr-options-panel').append('<div id="csr-test-title" class="csr-options-tab"><h3>Test Suites</h3></div>');
+    	$('#csr-options-panel').append('<div id="csr-doc-title" class="csr-options-tab"><h3>Documents</h3></div>');
+    	$('#csr-options-panel').append('<div style="clear: both;"></div>');
+    	$('#csr-options-panel').append('<div id="csr-test-tab" class="csr-options-content"></div>');
+    	$('#csr-options-panel').append('<div id="csr-doc-tab" class="csr-options-content"></div>');
+    	$('.csr-options-title').append('<button id="csr-options-button" class="csr">&nbsp;APPLY&nbsp;</button>');
     	$('#csr-options-button').click(function () {
     		engine.applyOptions();
     	});
     	
-    	$('#csr-options-panel').append('<h2>Options</h2>');
+    	$('.csr-options-title').append('<h2>Options</h2>');
     	
     	// Test suite options
-    	$('#csr-options-panel').append('<h3>Test Suites</h3>');
-    	$('#csr-options-panel').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-test-suite" value="csr-html">HTML</input></div>');
-    	$('#csr-options-panel').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-test-suite" value="csr-css">CSS</input></div>');
-    	$('#csr-options-panel').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-test-suite" value="csr-javascript">JavaScript</input></div>');
+    	$('#csr-test-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-test-suite-all">Select All</input></div>');
+    	$('#csr-test-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-test-suite" value="csr-html">HTML</input></div>');
+    	$('#csr-test-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-test-suite" value="csr-css">CSS</input></div>');
+    	$('#csr-test-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-test-suite" value="csr-javascript">JavaScript</input></div>');
     	if (this.runHtml) { $('.csr-options-checkbox[value="csr-html"]').prop('checked', true); }
     	if (this.runCss) { $('.csr-options-checkbox[value="csr-css"]').prop('checked', true); }
     	if (this.runJavascript) { $('.csr-options-checkbox[value="csr-javascript"]').prop('checked', true); }
+    	
+    	// Document filters
+    	$('#csr-doc-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-document-all">Select All</input></div>');
+    	for (var i=0; i<engine.documents.length; i++) {
+    		var doc = engine.documents[i];
+    		$('#csr-doc-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-document" value="csr-' + doc.getShortName() + '">' + doc.getShortName() + '</input></div>');
+    		if (!engine.filters.ignore(doc.getShortName()))
+    			$('.csr-options-checkbox[value="csr-' + doc.getShortName() + '"]').prop('checked', true);
+    	}
+    	
+    	$('.csr-options-checkbox[name="csr-test-suite-all"]').prop('checked', true);
+    	$('.csr-options-checkbox[name="csr-test-suite"]').each(function () {
+			if ($(this).prop('checked') == false)
+				$('.csr-options-checkbox[name="csr-test-suite-all"]').prop('checked', false);
+		});
+    	
+    	$('.csr-options-checkbox[name="csr-document-all"]').prop('checked', true);
+    	$('.csr-options-checkbox[name="csr-document"]').each(function () {
+			if ($(this).prop('checked') == false)
+				$('.csr-options-checkbox[name="csr-document-all"]').prop('checked', false);
+		});
+    	
+    	engine.defineOptionEvents();
     },
 
     // go through each document and run source code through appropriate test cases
@@ -137,7 +222,7 @@ CSREngine.prototype = {
     	
         for (var i = 0; i < this.documents.length; i++) {
             var doc = this.documents[i];
-            if (doc.getContent()) {
+            if (!engine.filters.ignore(doc.getShortName()) && doc.getContent()) {
                 var docAnalysis = new DocAnalysis(doc);
                 docAnalysis.runAnalysis(engine.runHtml, engine.runCss, engine.runJavascript);
             }
@@ -151,12 +236,48 @@ CSREngine.prototype = {
     applyOptions: function () {
     	var engine = this;
     	
+    	$('#csr-content').html('');
+    	
+    	// Check test suite options
+    	$('.csr-options-checkbox[value="csr-html"]').prop('checked') == true ? engine.runHtml = true : engine.runHtml = false;
+    	$('.csr-options-checkbox[value="csr-css"]').prop('checked') == true ? engine.runCss = true : engine.runCss = false;
+    	$('.csr-options-checkbox[value="csr-javascript"]').prop('checked') == true ? engine.runJavascript = true : engine.runJavascript = false;
+    	
+    	// Adjust filters for selected documents
+    	for (var i=0; i<engine.documents.length; i++) {
+    		var doc = engine.documents[i];
+    		var name = doc.getShortName();
+    		var checked = $('.csr-options-checkbox[value="csr-' + doc.getShortName() + '"]').prop('checked');
+    		
+    		// This document should be analyzed
+    		if (checked) {
+    			if (engine.filters.ignore(name)) {
+    				if (engine.filters.removeFilter(name)) {
+	    				if (engine.filters.ignore(name))
+	    					engine.filters.addNoFilter(name);
+    				}
+	    			else
+	    				engine.filters.addNoFilter(name);
+    			}
+    		}
+    		
+    		// This document should not be analyzed
+    		else {
+    			if (!engine.filters.ignore(name)) {
+    				if (engine.filters.removeNoFilter(name)) {
+	    				if (!engine.filters.ignore(name))
+	    					engine.filters.addFilter(name);
+    				}
+	    			else
+	    				engine.filters.addFilter(name);
+    			}
+    		}
+    	}
+    	
     	while (engine.documents.length > 0)
     		engine.documents.pop();
     	while (engine.testCases.length > 0)
     		engine.testCases.pop();
-    	
-    	$('#csr-content').html('');
     	
     	engine.populateDocuments();
         engine.populateTestCases();
@@ -342,6 +463,7 @@ TestCase.prototype = {
 function Document(location, type) {
 
     this.location = location;
+    this.shortName;
     this.content;
     this.type = type;
     this.errorCount;
@@ -354,6 +476,8 @@ Document.prototype = {
 
     getLocation: function () { return this.location; },
     setLocation: function (loc) { this.location = loc },
+    
+    getShortName: function () { return this.shortName; },
 
     getContent: function () { return this.content; },
     setContent: function (con) { this.content = con },
@@ -383,8 +507,10 @@ Document.prototype = {
             },
             error: function () {
                 // document was not found or contains compilation errors
-                console.log(doc.location + " contains compilation errors or does not exist: Please fix and refresh");
-                util.printString(doc.location + " contains compilation errors or does not exist: Please fix and refresh", "csr-bold csr-error");
+                if (!window.CSREngine.filters.ignore(URL)) {
+	                console.log(doc.location + " contains compilation errors or does not exist: Please fix and refresh");
+	                util.printString(doc.location + " contains compilation errors or does not exist: Please fix and refresh", "csr-bold csr-error");
+                }
                 doc.content = null;
             },
             async: false
@@ -399,6 +525,10 @@ Document.prototype = {
     initialize: function () {
 
         this.errorCount = 0;
+        
+        var locPieces = this.location.split('\/');
+        this.shortName = locPieces[locPieces.length-1];
+        
         if (this.type == "html") {
             this.content = window.CSREngine.getHtmlSource();
         }
@@ -445,9 +575,33 @@ Filters.prototype = {
     addFilter: function (filter) {
     	this.filters.push(filter);
     },
+    
+    removeFilter: function (filter) {
+    	var success = false;
+    	for (var i = 0; i < this.filters.length; i++) {
+    		if (filter.toLowerCase() == this.filters[i].toLowerCase()) {
+    			this.filters.splice(i, 1);
+    			success = true;
+    		}
+    	}
+    	
+    	return success;
+    },
 	
 	addNoFilter: function (filter) {
 		this.noFilters.push(filter);
+	},
+	
+	removeNoFilter: function (filter) {
+		var success = false;
+		for (var i = 0; i < this.noFilters.length; i++) {
+    		if (filter.toLowerCase() == this.noFilters[i].toLowerCase()) {
+    			this.noFilters.splice(i, 1);
+    			success = true;
+    		}
+    	}
+    	
+    	return success;
 	},
 
     initialize: function () {
