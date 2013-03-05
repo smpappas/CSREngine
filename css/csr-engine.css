@@ -11,12 +11,19 @@
 
 /*** GENERAL STYLE ***/
 
-#csr-wrapper {
+#csr-resizable {
     border-bottom: 1px solid #757575;
+	height: 280px;
+	padding-bottom: 13px;
+}
+
+#csr-wrapper {
     margin: 0;
-    max-height: 288px;
+    height: 100%;
     overflow: auto;
     padding: 4px 12px 8px 12px;
+    position: relative;
+    z-index: 999;
 }
 
 .csr {
@@ -44,6 +51,7 @@
     left: 47%;
     margin: 0 auto;
     top: 0;
+    z-index: 1000;
 }
 
 .csr-button:hover, .csr-button:active { border-color: #A0A0A0; }
@@ -140,3 +148,74 @@
 }
 
 .csr-error { color: #BD0000; }
+
+/*** JQUERY UI RESIZABLE ***/
+
+.ui-resizable {
+	position: relative;
+}
+.ui-resizable-handle {
+	position: absolute;
+	font-size: 0.1px;
+	display: block;
+}
+.ui-resizable-disabled .ui-resizable-handle,
+.ui-resizable-autohide .ui-resizable-handle {
+	display: none;
+}
+.ui-resizable-n {
+	cursor: n-resize;
+	height: 7px;
+	width: 100%;
+	top: -5px;
+	left: 0;
+}
+.ui-resizable-s {
+	cursor: s-resize;
+	height: 7px;
+	width: 100%;
+	bottom: -5px;
+	left: 0;
+}
+.ui-resizable-e {
+	cursor: e-resize;
+	width: 7px;
+	right: -5px;
+	top: 0;
+	height: 100%;
+}
+.ui-resizable-w {
+	cursor: w-resize;
+	width: 7px;
+	left: -5px;
+	top: 0;
+	height: 100%;
+}
+.ui-resizable-se {
+	cursor: se-resize;
+	width: 12px;
+	height: 12px;
+	right: 1px;
+	bottom: 1px;
+}
+.ui-resizable-sw {
+	cursor: sw-resize;
+	width: 9px;
+	height: 9px;
+	left: -5px;
+	bottom: -5px;
+}
+.ui-resizable-nw {
+	cursor: nw-resize;
+	width: 9px;
+	height: 9px;
+	left: -5px;
+	top: -5px;
+}
+.ui-resizable-ne {
+	cursor: ne-resize;
+	width: 9px;
+	height: 9px;
+	right: -5px;
+	top: -5px;
+}

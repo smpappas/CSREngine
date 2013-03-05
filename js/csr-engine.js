@@ -23,6 +23,7 @@ function CSREngine() {
 
     this.styleSheetLocation = "http://www.steve-pappas.com/staticsmp/csr-engine/css/csr-engine.css";
     this.testCaseLocation = "http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-test-cases.js";
+    this.jqueryUILocation = "http://www.steve-pappas.com/staticsmp/csr-engine/js/jquery-ui.min.js";
     this.allDocuments = [];
     this.documents = [];
     this.testCases = [];
@@ -45,8 +46,8 @@ CSREngine.prototype = {
     getHtmlSource: function () { return this.htmlSource; },
     setHtmlSource: function (source) { this.htmlSource = source; },
 
-    addDocument: function (location, type) {
-        var doc = new Document(location, type);
+    addDocument: function (location, type, internal, content) {
+        var doc = new Document(location, type, internal, content);
         this.documents.push(doc);
     },
 
@@ -63,15 +64,15 @@ CSREngine.prototype = {
 
     // add minimize/maximize button
     addToggleButtons: function () {
-        $('#csr-wrapper').before('<button id="csr-button" class="csr csr-button">Minimize</button>');
+        $('#csr-resizable').before('<button id="csr-button" class="csr csr-button">Minimize</button>');
 
         $('#csr-button').on('click', function () {
-            if ($('#csr-wrapper').css('display') == "none") {
-                $('#csr-wrapper').slideDown();
+            if ($('#csr-resizable').css('display') == "none") {
+                $('#csr-resizable').slideDown();
                 $(this).html('Minimize');
             }
             else {
-                $('#csr-wrapper').slideUp();
+                $('#csr-resizable').slideUp();
                 $(this).html('Maximize');
             }
         });
@@ -83,6 +84,16 @@ CSREngine.prototype = {
         var filters = this.filters;
 
         engine.addDocument('HTML Source', 'html');
+        
+        // find all internal styles
+        var styleCount = 1;
+        $('style').each(function() {
+        	var source = "Internal Style " + styleCount;
+        	engine.addDocument(source, 'css', true, $(this).html());
+            $(this).data('csr', 'Internal Style ' + styleCount);
+        	
+        	styleCount++;
+        });
 
         // find all CSS documents
         $('link').each(function () {
@@ -92,13 +103,13 @@ CSREngine.prototype = {
             if (source.indexOf("csr-") >= 0)
             	return true;
 
-            // if document is not to be filtered out
             if (source != "" && type == "stylesheet") {
                 engine.addDocument(source, 'css');
             }
         });
-
+        
         // find all JavaScript documents
+        var scriptCount = 1;
         $('script').each(function () {
             var source = $(this).prop('src');
             var type = $(this).prop('type');
@@ -106,9 +117,16 @@ CSREngine.prototype = {
             if (source.indexOf("csr-") >= 0)
             	return true;
 
-            // if document is not to be filtered out
             if (source != "") {
                 engine.addDocument(source, 'js');
+            }
+            // if script is internal
+            else if ($(this).data('csr') != "csr") {
+            	source = "Internal Script " + scriptCount;
+            	engine.addDocument(source, 'js', true, $(this).html());
+            	$(this).data('csr', 'Internal Script ' + scriptCount);
+        	
+        		scriptCount++;
             }
         });
     },
@@ -289,23 +307,28 @@ CSREngine.prototype = {
 
         // Add CSR Engine stylesheet and create section before the body
         $('head').append('<link rel="stylesheet" href="' + engine.styleSheetLocation + '" type="text/css" />');
-        $.getScript(engine.testCaseLocation, function () {
-            $('body').before('<section id="csr-wrapper" class="csr"></section>');
-            $('#csr-wrapper').append('<div id="csr-options-panel"></div>')
-
-            engine.addToggleButtons();
-
-            // Print introduction message
-            $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
-            $('#csr-wrapper').append('<div id="csr-content"></div>');
-
-            // Populate array of linked client-side documents
-            engine.populateDocuments();
-            engine.populateTestCases();
-            engine.populateOptions();
-            engine.analyzeDocuments();
-
-            engine.test();
+	    $('body').before('<section id="csr-resizable" class="csr ui-widget-content ui-resizable"></section>');
+	    $('#csr-resizable').append('<div id="csr-wrapper" class="csr"></div>');
+        $.getScript(engine.jqueryUILocation, function() {
+        	$.getScript(engine.testCaseLocation, function () {
+	            $('#csr-wrapper').append('<div id="csr-options-panel"></div>')
+	            
+    			$('#csr-resizable').resizable({ handles: 'n, s' });
+	
+	            engine.addToggleButtons();
+	
+	            // Print introduction message
+	            $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
+	            $('#csr-wrapper').append('<div id="csr-content"></div>');
+	
+	            // Populate array of linked client-side documents
+	            engine.populateDocuments();
+	            engine.populateTestCases();
+	            engine.populateOptions();
+	            engine.analyzeDocuments();
+	
+	            engine.test();
+	        });
         });
     },
 
@@ -460,13 +483,14 @@ TestCase.prototype = {
 
 // Document Class
 
-function Document(location, type) {
+function Document(location, type, internal, content) {
 
     this.location = location;
     this.shortName;
-    this.content;
+    this.content = content;
     this.type = type;
     this.errorCount;
+    this.internal = internal;
 
     this.initialize();
 
@@ -524,7 +548,7 @@ Document.prototype = {
 
     initialize: function () {
 
-        this.errorCount = 0;
+		this.errorCount = 0;
         
         var locPieces = this.location.split('\/');
         this.shortName = locPieces[locPieces.length-1];
@@ -532,7 +556,7 @@ Document.prototype = {
         if (this.type == "html") {
             this.content = window.CSREngine.getHtmlSource();
         }
-        else {
+        else if (!this.internal) {
             this.readContent();
         }
 
