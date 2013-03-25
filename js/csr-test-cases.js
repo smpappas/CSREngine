@@ -167,8 +167,8 @@ var csrAltTextTest = {
                 var a = line.indexOf("alt", j);
                 if (a > k || a == -1) {
                     document.addError();
-                    util.printError(i + 2, "No alt text specified for image");
-                    new CodeBlock(util.escapeHTML(line.trim()), i + 2).print();
+                    util.printError(i + 1, "No alt text specified for image");
+                    new CodeBlock(util.escapeHTML(line.trim()), i + 1).print();
                     errorFound = true;
                 }
                 index = line.indexOf("<img", k);
@@ -194,8 +194,8 @@ var csrScriptTest = {
                 var a = line.indexOf("type", j);
                 if (a > k || a == -1) {
                     document.addError();
-                    util.printError(i + 2, "No script type specified");
-                    new CodeBlock(util.escapeHTML(line.trim()), i + 2).print();
+                    util.printError(i + 1, "No script type specified");
+                    new CodeBlock(util.escapeHTML(line.trim()), i + 1).print();
                     errorFound = true;
                 }
                 index = line.indexOf("<script", k);
@@ -217,8 +217,8 @@ var csrOnClickTest = {
             var errorFound = false;
             while (index != -1 && !errorFound) {
                 document.addError();
-                util.printError(i + 2, "Please do not use 'onclick' to attach click events; attach events in JavaScript files");
-                new CodeBlock(util.escapeHTML(line.trim()), i + 2).print();
+                util.printError(i + 1, "Please do not use 'onclick' to attach click events; attach events in JavaScript files");
+                new CodeBlock(util.escapeHTML(line.trim()), i + 1).print();
                 index = line.indexOf("onclick=", index + 1);
                 errorFound = true;
             }

@@ -21,14 +21,19 @@ $(function () {
 
 function CSREngine() {
 
-    this.styleSheetLocation = "http://www.steve-pappas.com/staticsmp/csr-engine/css/csr-engine.css";
-    this.testCaseLocation = "http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-test-cases.js";
-    this.jqueryUILocation = "http://www.steve-pappas.com/staticsmp/csr-engine/js/jquery-ui.min.js";
+    this.locPrefix = "http://www.steve-pappas.com/staticsmp/csr-engine/";
+    this.styleSheetLocation = this.locPrefix + "css/csr-engine.css";
+    this.testCaseLocation = this.locPrefix + "js/csr-test-cases.js";
+    this.jqueryUILocation = this.locPrefix + "js/jquery-ui.min.js";
+    this.beautifyLocation = this.locPrefix + "js/beautify/beautify.js"
     this.allDocuments = [];
     this.documents = [];
     this.testCases = [];
     this.htmlSource;
     this.tcDone = false;
+    
+    // Code display
+    this.docNum = 0;
     
     // Options
     this.consolePrint = false;
@@ -256,6 +261,8 @@ CSREngine.prototype = {
     	
     	$('#csr-content').html('');
     	
+    	engine.docNum = 0;
+    	
     	// Check test suite options
     	$('.csr-options-checkbox[value="csr-html"]').prop('checked') == true ? engine.runHtml = true : engine.runHtml = false;
     	$('.csr-options-checkbox[value="csr-css"]').prop('checked') == true ? engine.runCss = true : engine.runCss = false;
@@ -300,6 +307,24 @@ CSREngine.prototype = {
     	engine.populateDocuments();
         engine.populateTestCases();
         engine.analyzeDocuments();
+        
+        SyntaxHighlighter.highlight();
+    },
+    
+    addSyntaxHighlighting: function () {
+    	var engine = this;
+        $('head').append('<link rel="stylesheet" href="' + engine.locPrefix + 'css/syntax/shCore.css" type="text/css" />');
+        $('head').append('<link rel="stylesheet" href="' + engine.locPrefix + 'css/syntax/shThemeDefault.css" type="text/css" />');
+        
+        $.getScript(engine.locPrefix + 'js/syntax/shCore.js', function() {
+        	$.getScript(engine.locPrefix + 'js/syntax/shBrushJScript.js', function () {
+        		$.getScript(engine.locPrefix + 'js/syntax/shBrushCss.js', function() {
+        			$.getScript(engine.locPrefix + 'js/syntax/shBrushXml.js', function () {
+        				SyntaxHighlighter.all();
+        			});
+        		});
+        	});
+        });
     },
 
     runNormal: function () {
@@ -307,8 +332,11 @@ CSREngine.prototype = {
 
         // Add CSR Engine stylesheet and create section before the body
         $('head').append('<link rel="stylesheet" href="' + engine.styleSheetLocation + '" type="text/css" />');
+        $('head').append('<script src="' + engine.beautifyLocation + '" type="text/javascript"></script>');
+        engine.addSyntaxHighlighting();
 	    $('body').before('<section id="csr-resizable" class="csr ui-widget-content ui-resizable"></section>');
 	    $('#csr-resizable').append('<div id="csr-wrapper" class="csr"></div>');
+    	$('#csr-resizable').css('height', $(window).height() / 2);
         $.getScript(engine.jqueryUILocation, function() {
         	$.getScript(engine.testCaseLocation, function () {
 	            $('#csr-wrapper').append('<div id="csr-options-panel"></div>')
@@ -437,24 +465,57 @@ DocAnalysis.prototype = {
             }
         }
     },
+    
+    displaySource: function (type) {
+    	var btnid = "csr-displayCode" + window.CSREngine.docNum + "-view";
+    	var codeid = "csr-displayCode" + window.CSREngine.docNum;
+    	$('#csr-content').append('<span id="' + btnid + '" class="csr-view-source">View Source</span>');
+    	$('#' + btnid).toggle(function () {
+    		$('#' + codeid).slideDown();
+    		$(this).html('Hide Source');
+    	}, function () {
+    		$('#' + codeid).slideUp();
+    		$(this).html('View Source');
+    	});
+    	
+    	var brush;
+    	if (type === 'html')
+    		brush = 'xml';
+    	else if (type === 'css')
+    		brush = 'css';
+    	else
+    		brush = 'js';
+    		
+    	var code = '<div id="' + codeid + '" style="display: none;"><script type="syntaxhighlighter" class="brush: ' + brush + '"><![CDATA[';
+    	if (type === 'html')
+    		code += util.escapeHTML(this.document.content);
+    	else
+    		code += this.document.content;
+    	code += ']]></script></div>';
+    	$('#csr-content').append(code);
+    	window.CSREngine.docNum++;
+    },
 
     runAnalysis: function (runHtml, runCss, runJavascript) {
         if (this.document.getType() === 'html' && runHtml) {
-        	util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold");
+        	util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold csr-title csr-small-bottom");
+        	this.displaySource(this.document.getType());
             this.runHtmlAnalysis();
 	        if (!this.document.getErrorCount()) {
 	            util.printString("No errors found in document");
 	        }
         }
         else if (this.document.getType() === 'css' && runCss) {
-        	util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold");
+        	util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold csr-title csr-small-bottom");
+        	this.displaySource(this.document.getType());
             this.runCssAnalysis();
 	        if (!this.document.getErrorCount()) {
 	            util.printString("No errors found in document");
 	        }
         }
         else if (this.document.getType() === 'js' && runJavascript) {
-        	util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold");
+        	util.printString("Running analysis for " + this.document.getLocation() + " . . .", "csr-bold csr-title csr-small-bottom");
+        	this.displaySource(this.document.getType());
             this.runJsAnalysis();
 	        if (!this.document.getErrorCount()) {
 	            util.printString("No errors found in document");
@@ -487,7 +548,7 @@ function Document(location, type, internal, content) {
 
     this.location = location;
     this.shortName;
-    this.content = content;
+    this.content = content; // stores source code as a string
     this.type = type;
     this.errorCount;
     this.internal = internal;
@@ -520,6 +581,7 @@ Document.prototype = {
     // try to locate document and pull source code
     readContent: function () {
         var URL = this.getLocation();
+        var docType = this.type;
         var ready = false;
         var doc = this;
 
@@ -527,7 +589,11 @@ Document.prototype = {
             url: URL,
             success: function (data) {
                 // document was found
-                doc.content = data;
+                if (docType == "js")
+                	doc.content = js_beautify(data, null);
+                else
+                	doc.content = data;
+                //console.log(doc.content);
             },
             error: function () {
                 // document was not found or contains compilation errors
@@ -539,11 +605,6 @@ Document.prototype = {
             },
             async: false
         });
-    },
-
-    // returns an array of lines of the document so that line by line traversal can be done
-    getLines: function () {
-        return this.getContent().split('\n');
     },
 
     initialize: function () {
@@ -560,7 +621,43 @@ Document.prototype = {
             this.readContent();
         }
 
+    },
+    
+    /* 
+     * API For Static Code Analysis
+     * These functions are intended to aid in string analysis for the purpose
+     * of writing test cases. This should simplify the code needed to write
+     * test cases, however a complete parser for each language may allow for
+     * more thorough tests. Future expansion using parsers similar to those
+     * found in JSLint to generate logical representations of the code is possible.
+     */
+
+    /*
+     * Applies to: HTML, CSS, JS
+     * Description: Returns an array of lines of the document so that line by line traversal can be done
+     * Returns: array
+     */
+    getLines: function () {
+        return this.getContent().split('\n');
+    },
+    
+    /*
+     * Applies to: HTML, CSS, JS
+     * Description: Runs a regular expression against source code and returns all 
+     * 	matching locations and lines.
+     * Returns: array of CodeBlocks
+     */
+    regExp: function (r) {
+        //return this.getContent().indexOf(r, 0);
     }
+    
+    // JS: Helper to find instances of functions and return location and arguments
+    
+    // HTML: Helper to find instances of tags and return attribute values
+    
+    // CSS: Helper to find instances of class/identifier and return properties and values
+    
+    // CSS: Helper to find instances of property and return containing identifier and values
 
 };
 
