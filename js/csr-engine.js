@@ -94,7 +94,11 @@ CSREngine.prototype = {
         var styleCount = 1;
         $('style').each(function() {
         	var source = "Internal Style " + styleCount;
-        	engine.addDocument(source, 'css', true, $(this).html());
+        	var text = $(this).html();
+        	if (text[0] === '\n')
+        		engine.addDocument(source, 'css', true, text.substr(1, text.length));
+        	else
+        		engine.addDocument(source, 'css', true, text);
             $(this).data('csr', 'Internal Style ' + styleCount);
         	
         	styleCount++;
@@ -128,7 +132,11 @@ CSREngine.prototype = {
             // if script is internal
             else if ($(this).data('csr') != "csr") {
             	source = "Internal Script " + scriptCount;
-            	engine.addDocument(source, 'js', true, $(this).html());
+            	var text = $(this).html();
+	        	if (text[0] === '\n')
+	        		engine.addDocument(source, 'js', true, text.substr(1, text.length));
+	        	else
+        			engine.addDocument(source, 'js', true, text);
             	$(this).data('csr', 'Internal Script ' + scriptCount);
         	
         		scriptCount++;
@@ -253,7 +261,18 @@ CSREngine.prototype = {
     },
 
     test: function () {
-        /*** TEST AREA **/
+		/*** TEST AREA ***/
+		var engine = this;
+		
+		//var pattern = "function doMath\(\)";
+		//var pattern = "console\.log";
+		//var pattern = "parseInt";
+		var pattern = "^\\$\\(function\\(\\)\\s*\\{(.|[\r\n])*\\}\\);$";
+		var matches = engine.documents[6].regex(pattern);
+		   
+		for (var i=0; i<matches.length; i++) {
+			console.log(matches[i]);
+		}
     },
     
     applyOptions: function () {
@@ -638,7 +657,7 @@ Document.prototype = {
      * Returns: array
      */
     getLines: function () {
-        return this.getContent().split('\n');
+        return this.getContent().split("\n");
     },
     
     /*
@@ -647,8 +666,36 @@ Document.prototype = {
      * 	matching locations and lines.
      * Returns: array of CodeBlocks
      */
-    regExp: function (r) {
-        //return this.getContent().indexOf(r, 0);
+    regex: function (r) {
+    	var doc = this;
+    	var pattern = new RegExp(r, "gm");
+        var text = this.getContent();
+        var matches = [];
+        
+        /*
+         * May want to revamp CodeBlock to contain the following
+         * Want to return a line number range (for case of multiple lines),
+         * the matching text in some CodeBlock object,
+         * the full lines of code in the line number range in some CodeBlock object
+         */
+        var result;
+        while ( ( result = pattern.exec(text) ) != null ) {
+        	matches.push(result);
+        	console.log(doc.indexToLine(result["index"]));
+        }
+        
+        return matches;
+    },
+    
+    /*
+     * Applies to: HTML, CSS, JS
+     * Description: Takes an index number and converts it to a line number in source code
+     * Returns: integer
+     */
+    indexToLine: function (index) {
+    	var text = this.getContent().substr(0, index);
+    	
+    	return text.split("\n").length;
     }
     
     // JS: Helper to find instances of functions and return location and arguments
