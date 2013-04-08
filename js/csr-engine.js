@@ -264,14 +264,17 @@ CSREngine.prototype = {
 		/*** TEST AREA ***/
 		var engine = this;
 		
-		//var pattern = "function doMath\(\)";
-		//var pattern = "console\.log";
+		//var pattern = "function doMath\\(\\)";
+		//var pattern = "console\\.log";
 		//var pattern = "parseInt";
-		var pattern = "^\\$\\(function\\(\\)\\s*\\{(.|[\r\n])*\\}\\);$";
+		var pattern = "^\\$\\(function\\(\\)\\s*\\{" + util.anything() + "\\}\\);$";
 		var matches = engine.documents[6].regex(pattern);
 		   
 		for (var i=0; i<matches.length; i++) {
-			console.log(matches[i]);
+			console.log(matches[i].code);
+			console.log(matches[i].lineStart);
+			console.log(matches[i].lineEnd);
+			matches[i].printLines("Crazy new error");
 		}
     },
     
@@ -666,22 +669,25 @@ Document.prototype = {
      * 	matching locations and lines.
      * Returns: array of CodeBlocks
      */
-    regex: function (r) {
+    regex: function (r, options) {
     	var doc = this;
-    	var pattern = new RegExp(r, "gm");
+    	//var pattern = /^\$\(function\(\)\s*\{(.|[\r\n])*\}\);$/gm;
+    	if (options)
+    		var pattern = new RegExp(r, options);
+    	else
+    		var pattern = new RegExp(r, "gm");
         var text = this.getContent();
         var matches = [];
         
         /*
-         * May want to revamp CodeBlock to contain the following
-         * Want to return a line number range (for case of multiple lines),
-         * the matching text in some CodeBlock object,
-         * the full lines of code in the line number range in some CodeBlock object
+         * Results get returned as an array of Match object,
+         * which contains the matching code, line code,
+         * start and end lines for the matching code, and
+         * utility functions to act on the Match objects
          */
         var result;
         while ( ( result = pattern.exec(text) ) != null ) {
-        	matches.push(result);
-        	console.log(doc.indexToLine(result["index"]));
+        	matches.push(new Match(doc, result[0], doc.indexToLine(result["index"])));
         }
         
         return matches;
@@ -803,6 +809,64 @@ Filters.prototype = {
 
 };
 
+// Match Class
+
+function Match(doc, code, lineStart) {
+	
+	this.doc = doc;
+	this.code = code;
+	this.lineStart = lineStart;
+	this.lineEnd;
+	this.lineCode = "";
+	
+	this.initialize();
+	
+}
+
+Match.prototype = {
+	
+	printMatch: function (errorText) {
+		var lines = this.code.split("\n");
+		var block = new CodeBlock(lines[0].trim(), this.lineStart);
+		var lineNum = this.lineStart + 1;
+		
+		for (var i=1; i < lines.length; i++) {
+			block.add(lines[i], lineNum);
+			lineNum++;
+		}
+		
+		util.printError(this.lineStart, errorText);
+		block.print();
+	},
+	
+	printLines: function (errorText) {
+		var lines = this.lineCode.split("\n");
+		var block = new CodeBlock(lines[0].trim(), this.lineStart);
+		var lineNum = this.lineStart + 1;
+		
+		for (var i=1; i < lines.length; i++) {
+			block.add(lines[i], lineNum);
+			lineNum++;
+		}
+		
+		util.printError(this.lineStart, errorText);
+		block.print();
+	},
+	
+	initialize: function () {
+		this.lineEnd = this.lineStart + this.code.split("\n").length - 1;
+		
+		var lines = this.doc.getLines();
+        for (var i = this.lineStart-1; i < this.lineEnd; i++) {
+        	if (this.lineCode === "")
+            	this.lineCode += lines[i];
+            else
+            	this.lineCode += '\n' + lines[i];
+        }
+	}
+	
+};
+
 // CodeBlock Class
 
 function CodeBlock(code, line) {
@@ -861,9 +925,13 @@ CodeBlock.prototype = {
 
 };
 
-// Utility functions
+// Utility functions and variables
 
 var util = {
+	
+	anything: function () {
+		return "(.|[\r\n])*"; // Match any characters including new lines in regular expression
+	},
 
     printString: function (s, classes) {
         if (classes) {
