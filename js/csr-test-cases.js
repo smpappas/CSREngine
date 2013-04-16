@@ -29,7 +29,7 @@ var csrTestCases = {
 
 var csrIntRadixTest = {
 
-    execute: function (document) {
+    /*execute: function (document) {
         var lines = document.getLines();
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
@@ -57,13 +57,23 @@ var csrIntRadixTest = {
                 index = line.indexOf("parseInt", index + 1);
             }
         }
-    }
+    }*/
+   
+	execute: function (document) {
+		var matches = document.findFunction("parseInt");
+		   
+		for (var i=0; i<matches.length; i++) {
+			if (matches[i].args.length <= 1) {
+				matches[i].printLines("No radix specified");
+			}
+		}
+	}
 
 };
 
 var csrFloatRadixTest = {
 
-    execute: function (document) {
+    /*execute: function (document) {
         var lines = document.getLines();
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
@@ -88,10 +98,20 @@ var csrFloatRadixTest = {
                         errorFound = true;
                     }
                 }
-                index = line.indexOf("parseInt", index + 1);
+                index = line.indexOf("parseFloat", index + 1);
             }
         }
-    }
+    }*/
+    
+    execute: function (document) {
+		var matches = document.findFunction("parseFloat");
+		   
+		for (var i=0; i<matches.length; i++) {
+			if (matches[i].args.length > 1) {
+				matches[i].printLines("Radix is not necessary for parseFloat() as second parameter baby");
+			}
+		}
+	}
 
 };
 
@@ -153,7 +173,7 @@ var csrZeroUnitTest = {
 
 var csrAltTextTest = {
 
-    execute: function (document) {
+    /*execute: function (document) {
         var lines = document.getLines();
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
@@ -174,7 +194,25 @@ var csrAltTextTest = {
                 index = line.indexOf("<img", k);
             }
         }
-    }
+    }*/
+	
+	execute: function (document) {
+		var matches = document.findTag("img");
+		
+		var found = false;
+		for (var i=0; i<matches.length; i++) {
+			var attributes = matches[i].attributes;
+			for (var j=0; j<attributes.length; j++) {
+				if (attributes[j] === "alt") {
+					found = true;
+				}
+			}
+			if (found == false) {
+				matches[i].printLines("No alt text specified for image");
+			}
+			found = false;
+		}
+	}
 
 };
 
@@ -229,6 +267,20 @@ var csrOnClickTest = {
 
 var csrTypeWrapperTest = {
 
+    execute: function (document) {
+		var pattern = "\\=\\s*new\\s*(Boolean|String|Number)\\(";
+		var matches = document.regex(pattern);
+		   
+		for (var i=0; i<matches.length; i++) {
+			matches[i].printLines("Avoid type wrapper objects when possible");
+		}
+    }
+
+};
+
+// OLD VERSION
+/*var csrTypeWrapperTest = {
+
     findIndex: function (line, index) {
         var i1 = line.indexOf("new Boolean(", index);
         var i2 = line.indexOf("new String(", index);
@@ -259,4 +311,4 @@ var csrTypeWrapperTest = {
         }
     }
 
-};
+};*/

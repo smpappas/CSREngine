@@ -271,11 +271,15 @@ CSREngine.prototype = {
 		var matches = engine.documents[6].regex(pattern);
 		   
 		for (var i=0; i<matches.length; i++) {
-			console.log(matches[i].code);
-			console.log(matches[i].lineStart);
-			console.log(matches[i].lineEnd);
-			matches[i].printLines("Crazy new error");
+			matches[i].printLines("Example multiline code block");
 		}
+		
+		matches = engine.documents[0].findTag("img");
+		
+		/*for (var i=0; i<matches.length; i++) {
+			console.log(matches[i].attributes);
+			console.log(matches[i].attributeValues);
+		}*/
     },
     
     applyOptions: function () {
@@ -664,10 +668,10 @@ Document.prototype = {
     },
     
     /*
-     * Applies to: HTML, CSS, JS
+     * HTML, CSS, JS
      * Description: Runs a regular expression against source code and returns all 
      * 	matching locations and lines.
-     * Returns: array of CodeBlocks
+     * Returns: array of Match objects
      */
     regex: function (r, options) {
     	var doc = this;
@@ -687,14 +691,14 @@ Document.prototype = {
          */
         var result;
         while ( ( result = pattern.exec(text) ) != null ) {
-        	matches.push(new Match(doc, result[0], doc.indexToLine(result["index"])));
+        	matches.push(new Match(doc, result[0], doc.indexToLine(result["index"]), result["index"]));
         }
         
         return matches;
     },
     
     /*
-     * Applies to: HTML, CSS, JS
+     * HTML, CSS, JS
      * Description: Takes an index number and converts it to a line number in source code
      * Returns: integer
      */
@@ -702,15 +706,216 @@ Document.prototype = {
     	var text = this.getContent().substr(0, index);
     	
     	return text.split("\n").length;
-    }
+    },
     
-    // JS: Helper to find instances of functions and return location and arguments
+    /*
+     * JS
+     * Description: Finds instances of a function and returns locations and arguments
+     * Returns: array of Match objects
+     */
+    findFunction: function (f) {
+    	var doc = this;
+    	var content = doc.getContent();
+    	
+    	// find instances of function f
+    	var pattern = f + "\\s*\\(";
+    	var matches = doc.regex(pattern);
+    	
+    	// parse arguments of function
+    	for (var i=0; i<matches.length; i++) {
+    		var match = matches[i];
+    		match.functionName = f;
+    		
+    		curArg = "";
+    		var openParen = 1;
+    		var openCurly = 0;
+    		var openSquare = 0;
+    		var start = content.indexOf("(", match.indexStart);
+    		var j = start + 1;
+    		while (openParen > 0) {
+    			var c = content[j];
+    			if (c == '(') {
+    				openParen++;
+    				curArg += c;
+    			}
+    			else if (c == ')') {
+    				openParen--;
+    				if (openParen != 0) {
+    					curArg += c;
+    				}
+    			}
+    			else if (c == '{') {
+    				openCurly++;
+    				curArg += c;
+    			}
+    			else if (c == '}') {
+    				openCurly--;
+    				curArg += c;
+    			}
+    			else if (c == '[') {
+    				openSquare++;
+    				curArg += c;
+    			}
+    			else if (c == ']') {
+    				openSquare--;
+    				curArg += c;
+    			}
+    			else if (c == ',' && openParen == 1 && openCurly == 0 && openSquare == 0) {
+    				match.args.push(curArg);
+    				curArg = "";
+    			}
+    			else if (c != '\n' && c != ' ') {
+    				curArg += c;
+    			}
+    			else if (c == '\n') {
+    				match.lineEnd++;
+    			}
+    			j++;
+    		}
+    		if (curArg != "") {
+    			match.args.push(curArg);
+    		}
+    	}
+    	
+    	return matches;
+    },
     
     // HTML: Helper to find instances of tags and return attribute values
+    /*
+     * HTML
+     * Description: Finds instances of html tags and returns attribute values
+     * Returns: array of Match objects
+     */
+    findTag: function (tag) {
+    	var doc = this;
+    	var content = doc.getContent();
+    	
+    	// find instances of function f
+    	var pattern = "\\<\\s*" + tag;
+    	var matches = doc.regex(pattern);
+    	
+    	// parse attributes of tag
+    	for (var i=0; i<matches.length; i++) {
+    		var match = matches[i];
+    		match.tag = tag;
+    		
+    		var curAttr = "";
+    		var curValue = "";
+    		var onAttr = true;
+    		var openAngle = 1;
+    		var openDQ = 0;
+    		var openSQ = 0;
+    		
+    		// find start index
+    		var start = match.indexStart + 1;
+    		var tag2 = content[start];
+    		start++;
+    		while (tag2 != tag) {
+    			tag2 += content[start];
+    			start++;
+    		}
+    		var j = start;
+    		while (openAngle > 0) {
+    			var c = content[j];
+    			if (c == '<') {
+    				openAngle++;
+    				if (onAttr == true) {
+    					curAttr += c;
+    				} else {
+    					curValue += c;
+    				}
+    			}
+    			else if (c == '>') {
+    				openAngle--;
+    				if (openAngle != 0) {
+    					if (onAttr == true) {
+	    					curAttr += c;
+	    				} else {
+	    					curValue += c;
+	    				}
+    				}
+    			}
+    			else if (c == '=') {
+    				onAttr = false;
+    				match.attributes.push(curAttr);
+    				curAttr = "";
+    			}
+    			else if (c == '\"') {
+    				if (openDQ == 0) {
+    					openDQ++;
+    				} else {
+    					openDQ--;
+    				}
+    				if (onAttr == false && openSQ == 1) {
+    					curValue += c;
+    				}
+    				else if (openSQ == 0 && openDQ == 0) {
+    					onAttr = true;
+    					match.attributeValues.push(curValue);
+    					curValue = "";
+    				}
+    			}
+    			else if (c == '\'') {
+    				if (openSQ == 0) {
+    					openSQ++;
+    				} else {
+    					openSQ--;
+    				}
+    				if (onAttr == false && openDQ == 1) {
+    					curValue += c;
+    				}
+    				else if (openSQ == 0 && openDQ == 0) {
+    					onAttr = true;
+    					match.attributeValues.push(curValue);
+    					curValue = "";
+    				}
+    			}	
+    			else if (c != '\n' && c != ' ') {
+    				if (onAttr == true) {
+    					curAttr += c;
+    				} else {
+    					curValue += c;
+    				}
+    			}
+    			else if (c == '\n') {
+    				match.lineEnd++;
+    				if (onAttr == false && openDQ == 0 && openSQ == 0) {
+    					onAttr = true;
+    					match.attributeValues.push(curValue);
+    					curValue = "";
+    				}
+    			}
+    			else if (c == ' ') {
+    				if (onAttr == false && openDQ == 0 && openSQ == 0) {
+    					onAttr = true;
+    					match.attributeValues.push(curValue);
+    					curValue = "";
+    				}
+    				else if (onAttr == false && (openDQ > 0 || openSQ > 0)) {
+    					curValue += c;
+    				}
+    			}
+    			j++;
+    		}
+    		if (curAttr != "") {
+    			match.attributes.push(curAttr);
+    		}
+    		if (curValue != "") {
+    			match.attributeValues.push(curValue);
+    		}
+    	}
+    	return matches;
+    },
     
     // CSS: Helper to find instances of class/identifier and return properties and values
+    findSelector: function (s) {
+    	
+    },
     
     // CSS: Helper to find instances of property and return containing identifier and values
+    findProperty: function (prop) {
+    	
+    }
 
 };
 
@@ -811,13 +1016,23 @@ Filters.prototype = {
 
 // Match Class
 
-function Match(doc, code, lineStart) {
+function Match(doc, code, lineStart, indexStart) {
 	
 	this.doc = doc;
 	this.code = code;
 	this.lineStart = lineStart;
+	this.indexStart = indexStart;
 	this.lineEnd;
 	this.lineCode = "";
+	
+	// for findFunction()
+	this.functionName;
+	this.args = [];
+	
+	// for findTag
+	this.tag;
+	this.attributes = [];
+	this.attributeValues = [];
 	
 	this.initialize();
 	
@@ -826,10 +1041,11 @@ function Match(doc, code, lineStart) {
 Match.prototype = {
 	
 	printMatch: function (errorText) {
+		this.doc.addError();
 		var lines = this.code.split("\n");
-		var block = new CodeBlock(lines[0].trim(), this.lineStart);
-		var lineNum = this.lineStart + 1;
+		var block = new CodeBlock(util.escapeHTML(lines[0].trim()), this.lineStart);
 		
+		var lineNum = this.lineStart + 1;
 		for (var i=1; i < lines.length; i++) {
 			block.add(lines[i], lineNum);
 			lineNum++;
@@ -840,11 +1056,12 @@ Match.prototype = {
 	},
 	
 	printLines: function (errorText) {
-		var lines = this.lineCode.split("\n");
-		var block = new CodeBlock(lines[0].trim(), this.lineStart);
-		var lineNum = this.lineStart + 1;
+		this.doc.addError();
+		var lines = this.doc.getContent().split("\n");
+		var block = new CodeBlock(util.escapeHTML(lines[this.lineStart-1].trim()), this.lineStart);
 		
-		for (var i=1; i < lines.length; i++) {
+		var lineNum = this.lineStart + 1;
+		for (var i=lineNum-1; i < this.lineEnd; i++) {
 			block.add(lines[i], lineNum);
 			lineNum++;
 		}
