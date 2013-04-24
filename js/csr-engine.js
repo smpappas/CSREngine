@@ -25,7 +25,8 @@ function CSREngine() {
     this.styleSheetLocation = this.locPrefix + "css/csr-engine.css";
     this.testCaseLocation = this.locPrefix + "js/csr-test-cases.js";
     this.jqueryUILocation = this.locPrefix + "js/jquery-ui.min.js";
-    this.beautifyLocation = this.locPrefix + "js/beautify/beautify.js"
+    this.beautifyLocation = this.locPrefix + "js/beautify/beautify.js";
+    this.jslintLocation = this.locPrefix + "js/jslint/jslint.js";
     this.allDocuments = [];
     this.documents = [];
     this.testCases = [];
@@ -276,10 +277,9 @@ CSREngine.prototype = {
 		
 		matches = engine.documents[0].findTag("img");
 		
-		/*for (var i=0; i<matches.length; i++) {
-			console.log(matches[i].attributes);
-			console.log(matches[i].attributeValues);
-		}*/
+		/*JSLINT(engine.documents[6].getContent());
+		var data = JSLINT.data();
+		console.log(data);*/
     },
     
     applyOptions: function () {
@@ -365,23 +365,25 @@ CSREngine.prototype = {
     	$('#csr-resizable').css('height', $(window).height() / 2);
         $.getScript(engine.jqueryUILocation, function() {
         	$.getScript(engine.testCaseLocation, function () {
-	            $('#csr-wrapper').append('<div id="csr-options-panel"></div>')
-	            
-    			$('#csr-resizable').resizable({ handles: 'n, s' });
-	
-	            engine.addToggleButtons();
-	
-	            // Print introduction message
-	            $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
-	            $('#csr-wrapper').append('<div id="csr-content"></div>');
-	
-	            // Populate array of linked client-side documents
-	            engine.populateDocuments();
-	            engine.populateTestCases();
-	            engine.populateOptions();
-	            engine.analyzeDocuments();
-	
-	            engine.test();
+        		$.getScript(engine.jslintLocation, function () {
+		            $('#csr-wrapper').append('<div id="csr-options-panel"></div>')
+		            
+	    			$('#csr-resizable').resizable({ handles: 'n, s' });
+		
+		            engine.addToggleButtons();
+		
+		            // Print introduction message
+		            $('#csr-wrapper').append('<h1>Client-Side Reliability Engine</h1>');
+		            $('#csr-wrapper').append('<div id="csr-content"></div>');
+		
+		            // Populate array of linked client-side documents
+		            engine.populateDocuments();
+		            engine.populateTestCases();
+		            engine.populateOptions();
+		            engine.analyzeDocuments();
+		
+		            engine.test();
+		         });
 	        });
         });
     },
@@ -490,6 +492,34 @@ DocAnalysis.prototype = {
                 eval(tc.nameSpace + ".execute(this.document)");
             }
         }
+        
+        this.runJSLint();
+    },
+    
+    runJSLint: function () {
+    	// define jslint options
+        var options = {
+        	"browser": true,
+        	"devel": true,
+        	"predef": ["jQuery", "$"],
+        	"sloppy": true,
+        	"vars": true,
+        	"white": true
+        };
+        
+        // run jslint function ondocument content
+        JSLINT(this.document.getContent(), options);
+		var data = JSLINT.data();
+		//console.log(data);
+		
+		for (var i=0; i<data.errors.length; i++) {
+			var error = data.errors[i];
+
+			// Figure out how to deal with multiline errors
+			this.document.addError();
+            util.printError(error.line, error.reason);
+            new CodeBlock(error.evidence.trim(), error.line).print();
+		}
     },
     
     displaySource: function (type) {
@@ -706,6 +736,17 @@ Document.prototype = {
     	var text = this.getContent().substr(0, index);
     	
     	return text.split("\n").length;
+    },
+    
+    /*
+     * HTML, CSS, JS
+     * Description: Takes a line and returns the source code of the line
+     * Returns: string
+     */
+    lineToCode: function (line) {
+    	var content = this.getContent().split("\n");
+    	
+    	return content[line-1];
     },
     
     /*

@@ -27,7 +27,7 @@
 }
 
 .csr {
-    background-color: #EAEAEA;
+    background-color: #E8EAEC;
     font-family: 'Ubuntu', Helevetica, sans-serif;
     font-size: 12px;
     font-weight: normal;
@@ -138,18 +138,19 @@
 /*** ERROR AND CODE DISPLAY ***/
 
 .csr-pre {
-    color: #1874CD;
     margin-bottom: 4px;
     margin-left: 12px;
     margin-right: 32px;
 }
 
 .csr-code {
-    background-color: #6D6D73;
+    /*background-color: #6D6D73;*/
+	background-color: #F3F5F7;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 5px;
-    color: #DEDEDE;
+    /*color: #DEDEDE;*/
+	color: #181818;
     font-family: monospace;
     margin-bottom: 0;
     overflow: hidden;
@@ -161,11 +162,11 @@
 }
 
 .csr-code-line {
-    color: greenyellow;
+    color: #55B214;
     font-weight: bold;
 }
 
-.csr-error { color: #BD0000; }
+.csr-error { color: #8A360F; }
 
 .csr-view-source { color: #707070; margin-top: 0; }
 .csr-view-source:hover { cursor: pointer; text-decoration: underline; }
