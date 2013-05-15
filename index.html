@@ -44,26 +44,26 @@
 
 <p>jQuery can be referenced from Google's CDN by placing the following code inside the <code>&lt;head&gt;</code> tag of your page</p>
 
-<pre><code>&lt;script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"&gt;&lt;/script&gt;
-</code></pre>
+<div class="highlight"><pre>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
 
 <h4>Usage</h4>
 
 <p>In the <code>&lt;head&gt;</code> tag of your page, include the following reference</p>
 
-<pre><code>&lt;script src="/path/to/csr-engine.js" type="text/javascript"&gt;&lt;/script&gt;
-</code></pre>
+<div class="highlight"><pre>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/path/to/csr-engine.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
 
 <p>At the bottom of the <code>&lt;head&gt;</code> tag, also include the following script block</p>
 
-<pre><code>&lt;script type="text/javascript"&gt;
-    $(function () {
-            var options = { }
+<div class="highlight"><pre>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+        <span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span> <span class="p">}</span>
 
-            CSREngine.initialize(options);
-        });
-&lt;/script&gt;
-</code></pre>
+                <span class="nx">CSREngine</span><span class="p">.</span><span class="nx">initialize</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+            <span class="p">});</span>
+    <span class="nt">&lt;/script&gt;</span>
+</pre></div>
 
 <p>This script block initializes the Client-Side Reliability Engine and runs an analysis with the default options.</p>
 
@@ -71,35 +71,35 @@
 
 <p>Options can be defined both in the <code>&lt;script&gt;</code> drop-in code to replace defaults, or chosen from the options panel within your Web page. An example script to set the default options is shown below.</p>
 
-<pre><code>&lt;script type="text/javascript"&gt;
-    $(function () {
-            var options = {
-                "html": true,
-                "css": true,
-                "javascript": true,
-                "filters": [
-                    "tria1.js",
-                    "trial2.js"
-                ],
-                "noFilters": [
+<div class="highlight"><pre>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+        <span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">"html"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="s2">"css"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="s2">"javascript"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="s2">"filters"</span><span class="o">:</span> <span class="p">[</span>
+                        <span class="s2">"tria1.js"</span><span class="p">,</span>
+                        <span class="s2">"trial2.js"</span>
+                    <span class="p">],</span>
+                    <span class="s2">"noFilters"</span><span class="o">:</span> <span class="p">[</span>
 
-                ],
-                "lint": true,
-                // define jslint options
-                "lintOptions": [ {
-                    "browser": true,
-                    "devel": true,
-                    "predef": ["jQuery", "$"],
-                    "sloppy": true,
-                    "vars": true,
-                    "white": true
-                } ]
-            }
+                    <span class="p">],</span>
+                    <span class="s2">"lint"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="c1">// define jslint options</span>
+                    <span class="s2">"lintOptions"</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span>
+                        <span class="s2">"browser"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                        <span class="s2">"devel"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                        <span class="s2">"predef"</span><span class="o">:</span> <span class="p">[</span><span class="s2">"jQuery"</span><span class="p">,</span> <span class="s2">"$"</span><span class="p">],</span>
+                        <span class="s2">"sloppy"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                        <span class="s2">"vars"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                        <span class="s2">"white"</span><span class="o">:</span> <span class="kc">true</span>
+                    <span class="p">}</span> <span class="p">]</span>
+                <span class="p">}</span>
 
-            CSREngine.initialize(options);
-        });
-&lt;/script&gt;
-</code></pre>
+                <span class="nx">CSREngine</span><span class="p">.</span><span class="nx">initialize</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+            <span class="p">});</span>
+    <span class="nt">&lt;/script&gt;</span>
+</pre></div>
 
 <p>The following options are available</p>
 
