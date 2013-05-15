@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Client-Side Reliability Engine by smpappas</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Client-Side Reliability Engine</h1>
+        <h2>HTML - CSS - JS</h2>
+        <a href="https://github.com/smpappas/CSREngine" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h2>Overview</h2>
+
+<p>The Client-Side Reliability Engine provides feedback on common bugs associated with HTML, CSS, and JavaScript code. The engine helps to ensure that best practices are being employed to improve reliability and reduce the chance of undesired results.</p>
+
+<p>An example can be found at <a href="http://steve-pappas.com/csr">http://steve-pappas.com/csr</a></p>
+
+<p>If you would like to be added to this project or request that the repository be made public, please email me at smp2183 AT columbia DOT edu .</p>
+
+<h2>Users</h2>
+
+<h4>Dependencies</h4>
+
+<p>The Client-Side Reliability Engine makes use of jQuery and requires version 1.6 or higher. For more information on jQuery, visit <a href="http://www.jquery.com">http://www.jquery.com</a>.</p>
+
+<p>jQuery can be referenced from Google's CDN by placing the following code inside the <code>&lt;head&gt;</code> tag of your page</p>
+
+<div class="highlight"><pre>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+<h4>Usage</h4>
+
+<p>In the <code>&lt;head&gt;</code> tag of your page, include the following reference</p>
+
+<div class="highlight"><pre>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/path/to/csr-engine.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+<p>At the bottom of the <code>&lt;head&gt;</code> tag, also include the following script block</p>
+
+<div class="highlight"><pre>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+        <span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span> <span class="p">}</span>
+
+                <span class="nx">CSREngine</span><span class="p">.</span><span class="nx">initialize</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+            <span class="p">});</span>
+    <span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<p>This script block initializes the Client-Side Reliability Engine and runs an analysis with the default options.</p>
+
+<h4>Options</h4>
+
+<p>Options can be defined both in the <code>&lt;script&gt;</code> drop-in code to replace defaults, or chosen from the options panel within your Web page. An example script to set the default options is shown below.</p>
+
+<div class="highlight"><pre>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+        <span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">"html"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="s2">"css"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="s2">"javascript"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="s2">"filters"</span><span class="o">:</span> <span class="p">[</span>
+                        <span class="s2">"tria1.js"</span><span class="p">,</span>
+                        <span class="s2">"trial2.js"</span>
+                    <span class="p">],</span>
+                    <span class="s2">"noFilters"</span><span class="o">:</span> <span class="p">[</span>
+
+                    <span class="p">],</span>
+                    <span class="s2">"lint"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="c1">// define jslint options</span>
+                    <span class="s2">"lintOptions"</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span>
+                        <span class="s2">"browser"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                        <span class="s2">"devel"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                        <span class="s2">"predef"</span><span class="o">:</span> <span class="p">[</span><span class="s2">"jQuery"</span><span class="p">,</span> <span class="s2">"$"</span><span class="p">],</span>
+                        <span class="s2">"sloppy"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                        <span class="s2">"vars"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                        <span class="s2">"white"</span><span class="o">:</span> <span class="kc">true</span>
+                    <span class="p">}</span> <span class="p">]</span>
+                <span class="p">}</span>
+
+                <span class="nx">CSREngine</span><span class="p">.</span><span class="nx">initialize</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+            <span class="p">});</span>
+    <span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<p>The following options are available</p>
+
+<p><code>"html"</code> - true to run HTML tests, false otherwise. Default is true.<br><code>"css"</code> - true to run CSS tests, false otherwise. Default is true.<br><code>"javascript"</code> - true to run JavaScript tests, false otherwise. Default is true.<br><code>"filters"</code> - List files that should not be included in the tests. For example, you may not want to include third-party library files that would not be filtered out by default.<br><code>"noFilters"</code> - List of files that should always be included in the tests. This will override the default filters.<br><code>"lint"</code> - true to run JSLint on JavaScript files, false otherwise. Default is true.<br><code>"lintOptions"</code> - Set the JSLint options. Defaults are shown in example above. Please see Options section at <a href="http://www.jslint.com/lint.html">http://www.jslint.com/lint.html</a> for details of each available option.<br></p>
+
+<p>Options will reset to these defaults on each refresh, but all options can be selected ad hoc through the options panel within the page.</p>
+
+<h4>Test Cases</h4>
+
+<p>The Client-Side Reliability Engine runs a series of test cases on each client-side file to determine if any issues exist. These tests perform static code analysis on each file, meaning no code within the file is actually executed. Test are grouped into test suites by file type. Each suite of tests can be added or removed from analysis through the Web page options panel.</p>
+
+<p>Please see the "Managing and Writing User Defined Test Cases" topic within the Developers section for more detail about user defined tests.</p>
+
+<h4>JSLint Integration</h4>
+
+<p>The Client-Side Reliability engine integrates JSLint to perform tests on JavaScript files. Integration is turned on by default, but can be turned off within script options or the options panel.</p>
+
+<p>All major JSLint options are available. Please see Options section at <a href="http://www.jslint.com/lint.html">http://www.jslint.com/lint.html</a> for details of each available option.</p>
+
+<h4>Filters</h4>
+
+<p>By default, common third-party libraries and frameworks, such as jQuery, MooTools, and backbone.js, are not analyzed by the engine. Default files to filter out can be added through the options discussed above. To override a file that is filtered out by default, add the file to the "noFilters" option. Files can also be added or removed from analysis through the Web page options panel.</p>
+
+<hr><h2>Developers</h2>
+
+<h4>Files</h4>
+
+<p><code>csr-engine.js</code> - Contains all classes and code relevant to the core functionality of the engine.<br><code>csr-test-cases.js</code> - Contains the implementation of all test cases, as well as a list of all test cases to be run.<br><code>csr-engine.css</code> - Contains all styling for the engine.</p>
+
+<h4>Hosting the Engine</h4>
+
+<p>The engine is currently hosted at: <a href="http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js">http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js</a></p>
+
+<p>To host the engine on a different server, each file needs to be uploaded to that server.  As explained above, the <code>&lt;script&gt;</code> tag in the Web page should link to the location of csr-engine.js.  In addition, csr-engine.js must be updated as described below.</p>
+
+<p>The CSREngine class contains two members called styleSheetLocation and testCaseLocation.  Update the following lines to contain the paths to each of these files, respectively.  These locations are defined toward the beginning of the file.</p>
+
+<pre><code>this.styleSheetLocation = "path/to/csr-engine.css";
+this.testCaseLocation = "path/to/csr-test-cases.js";
+</code></pre>
+
+<h4>Managing and Writing User Defined Test Cases</h4>
+
+<p>Each test case is designated a type, which determines which files the test applies to.</p>
+
+<p>New test cases can be added into the file csr-test-cases.js. Existing test cases can be used as a guide. The steps to create a new test case are as follows.</p>
+
+<ol>
+<li>
+<p>Add a new entry to the populateTestCases function within the csrTestCases namespace.  The entry should look similar to below.  The first parameter specifies the namespace of the test case you are creating, always beginning with "csr" - look at examples for clarification.  The second parameter will specify the file that the test case resides in, but this should be left as null until this is implemented.  The last parameter specifies the type of test case and should be one of "html", "css", or "js".</p>
+
+<pre><code>this.addTestCase("csrNamespaceOfTestCase", null, "html");</code></pre>
+</li>
+<li>
+<p>Create a namespace for the test case and an execute function.  The format should be similar to below.</p>
+
+<pre><code>var csrNamespaceOfTestCase = {
+
+    execute: function (document) {
+        // Test body goes here
+    }
+
+};</code></pre>
+</li>
+</ol><p>The execute function of your new test case will be called automatically.  There is no restriction to adding more helper functions within your new test namespace, and in fact this is encouraged for code clarity.  These functions can be called from execute, i.e. execute() can be thought of as a main() function, where code execution for your test case begins.</p>
+
+<h4>Helper Functions</h4>
+
+<p>There are a number of helper functions available to help with implementing test cases.  Please use existing examples as reference.</p>
+
+<p><em>Documents</em></p>
+
+<p><code>Document.getLines()</code>
+<br>      Returns an array that consists of the document split into lines.  This allows traversal of the document line by line using a <strong>for</strong> loop or similar.</p>
+
+<p><code>Document.addError()</code>
+<br>      Should be called when an error is found.  This is used to track the number of errors found in each document.</p>
+
+<p><em>Code Blocks</em></p>
+
+<p>A CodeBlock class has been implemented to make it easy to print formatted code to screen.  Example usage is shown below, and member functions are described.</p>
+
+<pre><code>var lines = document.getLines();
+for (var i = 0; i &lt; lines.length; i++) {
+    var line = lines[i];
+
+    // Trim line to ensure trailing spaces and new lines are not included
+    var cb = new CodeBlock(line.trim(), i+1);
+    cb.print();
+}
+</code></pre>
+
+<p><code>CodeBlock(code, lineNumber)</code>
+<br>      Initialize a new CodeBlock instance with code found at lineNumber.  Parameters code and lineNumber are optional, and CodeBlock will be initialized to be empty if not specified.</p>
+
+<p><code>CodeBlock.add(code, lineNumber)</code>
+<br>      Adds code found at lineNumber to current CodeBlock instance.  This can be used to create a single-line code block when the current instance is empty, or used to create multiline code blocks by calling this function on sequential lines of code.</p>
+
+<p><code>CodeBlock.clear()</code>
+<br>      Empties the current CodeBlock instance.  New code can be added to the existing code block through CodeBlock.add().</p>
+
+<p><code>CodeBlock.print()</code>
+<br>      Prints the current CodeBlock instance to screen.</p>
+
+<p><em>General Utility</em></p>
+
+<p><code>util.printString(s, classes)</code>
+<br>      Print string s to screen.  This function should always be used when printing to the tool output.  Parameter classes is optional and will add any specified CSS classes to the text output, e.g. to make text bold-italic specify "csr-bold csr-italic".</p>
+
+<p><code>util.printError(lineNumber, e)</code>
+<br>      Similar to util.printString(), prints error message e to screen.  Parameter lineNumber specifies which line the error occurred on.</p>
+
+<p><code>util.escapeHTML(code)</code>
+<br>      When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters.  This prevents the browser from trying to execute or interpret code.</p>
+
+<hr><h2>Extensibility / Open Issues</h2>
+
+<h4>Things to do</h4>
+
+<h4>Test Cases</h4>
+
+<p>Currently, all test cases are located in the file csr-test-cases.js.  In the future, it may be the case that multiple developers are working on test cases concurrently.  To avoid csr-test-cases.js being edited by all test case developers, ideally test cases will be split out into multiple files.</p>
+
+<p>Initial attempts to divide test cases into multiple files created issues, so all test cases were moved into csr-test-cases.js for the time being.</p>
+
+<hr><h2>Class Reference</h2>
+
+<p>Class descriptions and primary member functions listed below.</p>
+
+<h4>CSREngine Class</h4>
+
+<p>Used to create an instance of the engine where code execution begins.</p>
+
+<p><code>CSREngine.initialize()</code>
+<br>      Kicks off the engine analysis.</p>
+
+<p><code>CSREngine.runNormal()</code>
+<br>      Run analysis with option to print results above Web page.</p>
+
+<p><code>CSREngine.runConsole()</code>
+<br>      Run analysis with option priont results to JavaScript console.</p>
+
+<p><code>CSREngine.populateDocuments()</code>
+<br>      Search HTML source for <code>&lt;link&gt;</code> and <code>&lt;script&gt;</code> tags to populate array CSREngine.documents with all linked client-side files.</p>
+
+<p><code>CSREngine.populateTestCases()</code>
+<br>      Calls function <code>csrTestCases.populateTestCases()</code> located in csr-test-cases.js to populate an array of all current test cases.</p>
+
+<p><code>CSREngine.analyzeDocuments()</code>
+<br>      Creates an instance of DocAnalysis class for each linked client-side document and kicks off analysis on that document.</p>
+
+<h4>DocAnalysis Class</h4>
+
+<p>Used to run analysis on a particular document.</p>
+
+<p><code>DocAnalysis.runAnalysis()</code>
+<br>      Entry point for running analysis on a document.  Calls one of the below functions depending on the type of the document contained in the instance of the class.</p>
+
+<p><code>DocAnalysis.runHtmlAnalysis()</code>
+<br>      Runs all HTML test cases on the document.</p>
+
+<p><code>DocAnalysis.runCssAnalysis()</code>
+<br>      Runs all CSS test cases on the document.</p>
+
+<p><code>DocAnalysis.runJsAnalysis()</code>
+<br>      Runs all JavaScript test cases on the document.</p>
+
+<h5>TestCase Class</h5>
+
+<p>Contains information about a test case including its type and where the implementation is located.</p>
+
+<h4>Document Class</h4>
+
+<p>Contains information about a document (file) including its location, type, and source code.</p>
+
+<p><code>Document.getLines()</code>
+<br>      Returns an array that consists of the document split into lines.  This allows traversal of the document line by line using a <strong>for</strong> loop or similar.</p>
+
+<p><code>Document.addError()</code>
+<br>      Should be called when an error is found in document.  This is used to track the number of errors found in each document.</p>
+
+<p><code>Document.readContent()</code>
+<br>      Performs and AJAX request to locate the document.  If the document is found, the source code is assigned to class member content'.</p>
+
+<p><code>Document.getContent()</code>
+<br>      Returns the source code of the document contained in class member 'content'.</p>
+
+<p><code>Document.printContent()</code>
+<br>      Prints the source code of the document to the JavaScript console.  This is mostly used for debugging.</p>
+
+<h4>Filters Class</h4>
+
+<p>Used to create document filters to specify which documents should and should not be analyzed.</p>
+
+<p><code>Filters.initialize()</code>
+<br>      Defines the default filters and pushes them onto an array held in class member 'filters'.</p>
+
+<p><code>Filters.getFilters()</code>
+<br>      Returns an array of all filters held in class member 'filters'.</p>
+
+<p><code>Filters.ignore(source)</code>
+<br>      Takes in a file name/location and returns true if the file should be ignored during the analysis, false otherwise.</p>
+
+<h4>CodeBlock Class</h4>
+
+<p>Used to create a block or line of code to be printed to screen.</p>
+
+<p><code>CodeBlock(code, lineNumber)</code>
+<br>      Initialize a new CodeBlock instance with code found at lineNumber.  Parameters code and lineNumber are optional, and CodeBlock will be initialized to be empty if not specified.</p>
+
+<p><code>CodeBlock.add(code, lineNumber)</code>
+<br>      Adds code found at lineNumber to current CodeBlock instance.  This can be used to create a single-line code block when the current instance is empty, or used to create multiline code blocks by calling this function on sequential lines of code.</p>
+
+<p><code>CodeBlock.clear()</code>
+<br>      Empties the current CodeBlock instance.  New code can be added to the existing code block through CodeBlock.add().</p>
+
+<p><code>CodeBlock.print()</code>
+<br>      Prints the current CodeBlock instance to screen.</p>
+
+<h4>util (Utility Namespace)</h4>
+
+<p>Contains a number of utility and helper functions for use in implementing core functionality and test cases.</p>
+
+<p><code>util.printString(s, classes)</code>
+<br>      Print string s to screen.  This function should always be used when printing to the tool output.  Parameter classes is optional and will add any specified CSS classes to the text output, e.g. to make text bold-italic specify "csr-bold csr-italic".</p>
+
+<p><code>util.printError(lineNumber, e)</code>
+<br>      Similar to util.printString(), prints error message e to screen.  Parameter lineNumber specifies which line the error occurred on.</p>
+
+<p><code>util.escapeHTML(code)</code>
+<br>      When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters.  This prevents the browser from trying to execute or interpret code.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/smpappas/CSREngine/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/smpappas/CSREngine/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/smpappas/CSREngine"></a> is maintained by <a href="https://github.com/smpappas">smpappas</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
