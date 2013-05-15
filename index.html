@@ -51,6 +51,11 @@
 
 <p>In the <code>&lt;head&gt;</code> tag of your page, include the following reference</p>
 
+<div class="highlight"><pre>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+<p>You may also host the project separately. Please see the <a href="http://smpappas.github.io/CSREngine/developers">Developers</a> page for information about hosting. If hosted separately, include the following reference instead</p>
+
 <div class="highlight"><pre>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/path/to/csr-engine.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
 </pre></div>
 
@@ -131,7 +136,28 @@
 
 <h4>Files</h4>
 
-<p><code>csr-engine.js</code> - Contains all classes and code relevant to the core functionality of the engine.<br><code>csr-test-cases.js</code> - Contains the implementation of all test cases, as well as a list of all test cases to be run.<br><code>csr-engine.css</code> - Contains all styling for the engine.</p>
+<p>The directory structure looks as follows</p>
+
+<pre><code>CSREngine/
+    css/
+        csr-engine.css
+        syntax/
+            shCore.css
+    js/
+        csr-engine.js
+        csr-test-cases.js
+        beautify/
+            beautify.js
+        jslint/
+            jslint.js
+        syntax/
+            shBrushCss.js
+            shBrushJScript.js
+            shBrushXml.js
+            shCore.js
+</code></pre>
+
+<p><code>js/csr-test-cases.js</code> - Contains the implementation of all test cases, as well as a list of all test cases to be run.<br><code>js/csr-engine.css</code> - Contains all styling for the engine.<br><code>css/csr-engine.js</code> - Contains all classes and code relevant to the core functionality of the engine.<br><code>js/beautify/beautify.js</code> - Un-minifies scripts so that they can be analyzed.<br><code>js/jslint/jslint.js</code> - Contains the core functionality for JSLint by Douglas Crockford.<br><code>js/syntax/*</code> - Contains all scripts related to syntax highlighting.<br><code>css/syntax/shCore.css</code> - Contains styling for syntax highlighting.<br></p>
 
 <h4>Hosting the Engine</h4>
 
