@@ -38,7 +38,7 @@
 
 <h3>Users</h3>
 
-<p><strong>Dependencies</strong></p>
+<h5>Dependencies</h5>
 
 <p>The Client-Side Reliability Engine makes use of jQuery and requires version 1.6 or higher. For more information on jQuery, visit <a href="http://www.jquery.com">http://www.jquery.com</a>.</p>
 
@@ -47,7 +47,7 @@
 <pre><code>&lt;script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"&gt;&lt;/script&gt;
 </code></pre>
 
-<p><strong>Usage</strong></p>
+<h5>Usage</h5>
 
 <p>In the <code>&lt;head&gt;</code> tag of your page, include the following reference</p>
 
@@ -67,7 +67,7 @@
 
 <p>This script block initializes the Client-Side Reliability Engine and runs an analysis with the default options.</p>
 
-<p><strong>Options</strong></p>
+<h5>Options</h5>
 
 <p>Options can be defined both in the <code>&lt;script&gt;</code> drop-in code to replace defaults, or chosen from the options panel within your Web page. An example script to set the default options is shown below.</p>
 
@@ -107,29 +107,29 @@
 
 <p>Options will reset to these defaults on each refresh, but all options can be selected ad hoc through the options panel within the page.</p>
 
-<p><strong>Test Cases</strong></p>
+<h5>Test Cases</h5>
 
 <p>The Client-Side Reliability Engine runs a series of test cases on each client-side file to determine if any issues exist. These tests perform static code analysis on each file, meaning no code within the file is actually executed. Test are grouped into test suites by file type. Each suite of tests can be added or removed from analysis through the Web page options panel.</p>
 
 <p>Please see the "Managing and Writing User Defined Test Cases" topic within the Developers section for more detail about user defined tests.</p>
 
-<p><strong>JSLint Integration</strong></p>
+<h5>JSLint Integration</h5>
 
 <p>The Client-Side Reliability engine integrates JSLint to perform tests on JavaScript files. Integration is turned on by default, but can be turned off within script options or the options panel.</p>
 
 <p>All major JSLint options are available. Please see Options section at <a href="http://www.jslint.com/lint.html">http://www.jslint.com/lint.html</a> for details of each available option.</p>
 
-<p><strong>Filters</strong></p>
+<h5>Filters</h5>
 
 <p>By default, common third-party libraries and frameworks, such as jQuery, MooTools, and backbone.js, are not analyzed by the engine. Default files to filter out can be added through the options discussed above. To override a file that is filtered out by default, add the file to the "noFilters" option. Files can also be added or removed from analysis through the Web page options panel.</p>
 
 <hr><h3>Developers</h3>
 
-<p><strong>Files</strong></p>
+<h5>Files</h5>
 
 <p><code>csr-engine.js</code> - Contains all classes and code relevant to the core functionality of the engine.<br><code>csr-test-cases.js</code> - Contains the implementation of all test cases, as well as a list of all test cases to be run.<br><code>csr-engine.css</code> - Contains all styling for the engine.</p>
 
-<p><strong>Hosting the Engine</strong></p>
+<h5>Hosting the Engine</h5>
 
 <p>The engine is currently hosted at: <a href="http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js">http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js</a></p>
 
@@ -141,7 +141,7 @@
 this.testCaseLocation = "path/to/csr-test-cases.js";
 </code></pre>
 
-<p><strong>Managing and Writing User Defined Test Cases</strong></p>
+<h5>Managing and Writing User Defined Test Cases</h5>
 
 <p>Each test case is designated a type, which determines which files the test applies to.</p>
 
@@ -166,7 +166,7 @@ this.testCaseLocation = "path/to/csr-test-cases.js";
 </li>
 </ol><p>The execute function of your new test case will be called automatically.  There is no restriction to adding more helper functions within your new test namespace, and in fact this is encouraged for code clarity.  These functions can be called from execute, i.e. execute() can be thought of as a main() function, where code execution for your test case begins.</p>
 
-<p><strong>Helper Functions</strong></p>
+<h5>Helper Functions</h5>
 
 <p>There are a number of helper functions available to help with implementing test cases.  Please use existing examples as reference.</p>
 
@@ -217,30 +217,9 @@ for (var i = 0; i &lt; lines.length; i++) {
 
 <hr><h3>Extensibility / Open Issues</h3>
 
-<p><strong>Filters</strong></p>
+<h5>Things to do</h5>
 
-<p>The filters class currently filters out all files where the file name contains a substring as specified in <code>this.filters.push(substring)</code>.  A case may exist where the user wants to filter out some files that match this substring, but analyze others as normal.
-For example, it is likely that files named 'jquery-xxx' should be filtered out, but a user may make a custom extension called 'jquery-custom-extension-xxx'.  The Filters class could be expanded to allow the user to designate specific files that should not be filtered out, allowing user created files such as this to be analyzed.</p>
-
-<p><strong>Options</strong></p>
-
-<p>Though options have not been implemented yet, a number of options should be available to users in the future.  These options could be specified in the initialization script on the page, which might look similar to the following.</p>
-
-<pre><code>&lt;script type="text/javascript"&gt;
-    $(function () {
-        var options = { /* insert all options here */ };
-        CSREngine.initialize(options);
-    });
-&lt;/script&gt;
-</code></pre>
-
-<p>(i) Console Printing - Currently, the engine outputs all results above the current page.  This is specified in the line <code>CSREngine.initialize(false)</code>.  The user has the option of instead printing all results to the JavaScript console by specifying <code>CSREngine.initialize(true)</code>, making the output a bit less obtrusive.</p>
-
-<p>Although this functionality is not yet implemented, the member function <code>runConsole()</code> in the CSREngine class is a jumping off point.  Likely, all utility functions and member functions of the CodeBlock class will have to take this condition into account in order to print to console instead of to the Web page.</p>
-
-<p>(ii) Filters - As described above, the user needs a way to designate specific files that will always be analyzed, as well as files that should not be analyzed and are not part of the default filters.  These files should be made a part of the user options when initializing the CSREngine.</p>
-
-<p><strong>Test Cases</strong></p>
+<h5>Test Cases</h5>
 
 <p>Currently, all test cases are located in the file csr-test-cases.js.  In the future, it may be the case that multiple developers are working on test cases concurrently.  To avoid csr-test-cases.js being edited by all test case developers, ideally test cases will be split out into multiple files.</p>
 
@@ -250,7 +229,7 @@ For example, it is likely that files named 'jquery-xxx' should be filtered out, 
 
 <p>Class descriptions and primary member functions listed below.</p>
 
-<p><strong><em>CSREngine Class</em></strong></p>
+<h5>CSREngine Class</h5>
 
 <p>Used to create an instance of the engine where code execution begins.</p>
 
@@ -272,7 +251,7 @@ For example, it is likely that files named 'jquery-xxx' should be filtered out, 
 <p><code>CSREngine.analyzeDocuments()</code>
 <br>      Creates an instance of DocAnalysis class for each linked client-side document and kicks off analysis on that document.</p>
 
-<p><strong><em>DocAnalysis Class</em></strong></p>
+<h5>DocAnalysis Class</h5>
 
 <p>Used to run analysis on a particular document.</p>
 
@@ -288,11 +267,11 @@ For example, it is likely that files named 'jquery-xxx' should be filtered out, 
 <p><code>DocAnalysis.runJsAnalysis()</code>
 <br>      Runs all JavaScript test cases on the document.</p>
 
-<p><strong><em>TestCase Class</em></strong></p>
+<h6>TestCase Class</h6>
 
 <p>Contains information about a test case including its type and where the implementation is located.</p>
 
-<p><strong><em>Document Class</em></strong></p>
+<h5>Document Class</h5>
 
 <p>Contains information about a document (file) including its location, type, and source code.</p>
 
@@ -311,7 +290,7 @@ For example, it is likely that files named 'jquery-xxx' should be filtered out, 
 <p><code>Document.printContent()</code>
 <br>      Prints the source code of the document to the JavaScript console.  This is mostly used for debugging.</p>
 
-<p><strong><em>Filters Class</em></strong></p>
+<h5>Filters Class</h5>
 
 <p>Used to create document filters to specify which documents should and should not be analyzed.</p>
 
@@ -324,7 +303,7 @@ For example, it is likely that files named 'jquery-xxx' should be filtered out, 
 <p><code>Filters.ignore(source)</code>
 <br>      Takes in a file name/location and returns true if the file should be ignored during the analysis, false otherwise.</p>
 
-<p><strong><em>CodeBlock Class</em></strong></p>
+<h5>CodeBlock Class</h5>
 
 <p>Used to create a block or line of code to be printed to screen.</p>
 
@@ -340,7 +319,7 @@ For example, it is likely that files named 'jquery-xxx' should be filtered out, 
 <p><code>CodeBlock.print()</code>
 <br>      Prints the current CodeBlock instance to screen.</p>
 
-<p><strong><em>util (Utility Namespace)</em></strong></p>
+<h5>util (Utility Namespace)</h5>
 
 <p>Contains a number of utility and helper functions for use in implementing core functionality and test cases.</p>
 
