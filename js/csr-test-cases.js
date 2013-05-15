@@ -15,9 +15,9 @@ var csrTestCases = {
 
     // list of current test cases
     populateTestCases: function () {
-        this.addTestCase("csrIntRadixTest", null, "js");
+        //this.addTestCase("csrIntRadixTest", null, "js");
         this.addTestCase("csrFloatRadixTest", null, "js");
-        this.addTestCase("csrTypeWrapperTest", null, "js");
+        //this.addTestCase("csrTypeWrapperTest", null, "js");
         this.addTestCase("csrFallbackFontTest", null, "css");
         this.addTestCase("csrZeroUnitTest", null, "css");
         this.addTestCase("csrAltTextTest", null, "html");
@@ -64,7 +64,7 @@ var csrIntRadixTest = {
 		   
 		for (var i=0; i<matches.length; i++) {
 			if (matches[i].args.length <= 1) {
-				matches[i].printLines("No radix specified");
+				matches[i].printLines("No radix specified.");
 			}
 		}
 	}
@@ -108,7 +108,7 @@ var csrFloatRadixTest = {
 		   
 		for (var i=0; i<matches.length; i++) {
 			if (matches[i].args.length > 1) {
-				matches[i].printLines("Radix is not necessary for parseFloat() as second parameter baby");
+				matches[i].printLines("Radix is not necessary for parseFloat() as second parameter.");
 			}
 		}
 	}
@@ -134,7 +134,7 @@ var csrFallbackFontTest = {
                     var inheritIndex = line.indexOf("inherit", j);
                     if (!(inheritIndex > j && (inheritIndex < k || k == -1))) {
                         document.addError();
-                        util.printError(i + 1, "No fallback fonts specified in font-family property");
+                        util.printError(i + 1, "No fallback fonts specified in font-family property.");
                         new CodeBlock(line.trim(), i + 1).print();
                         errorFound = true;
                     }
@@ -163,7 +163,7 @@ var csrZeroUnitTest = {
             if (index != -1 || index2 != -1 ||
                         index3 != -1 || index4 != -1) {
                 document.addError();
-                util.printError(i + 1, "Units unnecessarily declared when specifying zero value");
+                util.printError(i + 1, "Units unnecessarily declared when specifying zero value.");
                 new CodeBlock(line.trim(), i + 1).print();
             }
         }
@@ -208,7 +208,7 @@ var csrAltTextTest = {
 				}
 			}
 			if (found == false) {
-				matches[i].printLines("No alt text specified for image");
+				matches[i].printLines("No alt text specified for image.");
 			}
 			found = false;
 		}
@@ -232,7 +232,7 @@ var csrScriptTest = {
                 var a = line.indexOf("type", j);
                 if (a > k || a == -1) {
                     document.addError();
-                    util.printError(i + 1, "No script type specified");
+                    util.printError(i + 1, "No script type specified.");
                     new CodeBlock(util.escapeHTML(line.trim()), i + 1).print();
                     errorFound = true;
                 }
@@ -255,7 +255,7 @@ var csrOnClickTest = {
             var errorFound = false;
             while (index != -1 && !errorFound) {
                 document.addError();
-                util.printError(i + 1, "Please do not use 'onclick' to attach click events; attach events in JavaScript files");
+                util.printError(i + 1, "Please do not use 'onclick' to attach click events; attach events in JavaScript files.");
                 new CodeBlock(util.escapeHTML(line.trim()), i + 1).print();
                 index = line.indexOf("onclick=", index + 1);
                 errorFound = true;
@@ -272,7 +272,7 @@ var csrTypeWrapperTest = {
 		var matches = document.regex(pattern);
 		   
 		for (var i=0; i<matches.length; i++) {
-			matches[i].printLines("Avoid type wrapper objects when possible");
+			matches[i].printLines("Avoid type wrapper objects when possible.");
 		}
     }
 

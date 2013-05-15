@@ -35,7 +35,7 @@
 
 .csr h1 { color: #181818; font-size: 20px; font-weight: bold; margin: 4px 0 4px 0; text-shadow: 2px 2px 2px #B8B6B9; }
 .csr h2 { color: inherit; font-size: 18px; font-weight: bold; margin: 1px 0 8px 0; }
-.csr h3 { color: inherit; font-size: 14px; font-weight: normal; margin: 0 0 8px 0; }
+.csr h3 { color: inherit; font-size: 12px; font-weight: normal; margin: 0 0 8px 0; }
 .csr-title { font-size: 14px; }
 
 .csr-bold { font-weight: medium; }
@@ -73,7 +73,7 @@
 }*/
 
 #csr-options-panel {
-	background-color: #BABABA;
+	background-color: #B8BABC;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
@@ -84,13 +84,13 @@
 	/*margin: 12px 4px 16px 16px;*/
 	/*max-height: 232px;
 	overflow: auto;*/
-	width: 200px;
+	width: 234px;
 	z-index: 10000;
 }
 
 #csr-options-button {
     float: right;
-    background-color: #3A3A40;
+    background-color: #3A3C40;
     border-radius: 4px;
     color: #CECECE;
     margin: 0;
@@ -98,6 +98,20 @@
 }
 
 #csr-options-button:hover { color: #F0F0F0; }
+
+#csr-options-toggle {
+    float: right;
+    background-color: #3A3C40;
+    border: none;
+    border-radius: 4px;
+    color: #CECECE;
+    margin: 0;
+    margin-left: 6px;
+    padding: 4px;
+    padding-right: 0;
+}
+
+#csr-options-toggle:hover { color: #F0F0F0; }
 
 .csr-options-element { margin: 0; }
 .csr-options-checkbox {
@@ -108,32 +122,34 @@
 .csr-options-label { display: inline; vertical-align: middle; }
 
 .csr-options-title {
-	background-color: #3A3A40;
+	background-color: #3A3C40;
 	border-top-left-radius: 4px;
 	border-top-right-radius: 4px;
 	padding: 8px 12px 4px 12px;
 }
 
-.csr-options-title h2 { color: #CECECE; }
+.csr-options-title h2 { color: #CCCED0; }
 
 .csr-options-tab {
-	background-color: #BABABA;
+	background-color: #B8BABC;
 	float: left;
-	height: 18px;
-	padding: 8px 12px 8px 12px;
+	height: 14px;
+	padding: 8px 7px 8px 7px;
 	text-align: center;
-	width: 76px;
+	width: 64px;
 }
 
-.csr-options-tab:hover { background-color: #5D5D63; color: #CECECE; cursor: pointer; }
+.csr-options-tab:hover { background-color: #5D5D63; color: #CCCED0; cursor: pointer; }
 
-.csr-selected { background-color: #5D5D63; color: #CECECE; }
+.csr-selected { background-color: #5B5D63; color: #CCCED0; }
 
 .csr-options-content {
 	padding: 4px 12px 6px 12px;
 }
 
 #csr-doc-tab { display: none; }
+
+#csr-jslint-tab { display: none; }
 
 /*** ERROR AND CODE DISPLAY ***/
 

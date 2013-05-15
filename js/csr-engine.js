@@ -42,6 +42,8 @@ function CSREngine() {
     this.runHtml = true;
     this.runCss = true;
     this.runJavascript = true;
+    this.lintPredef;
+    this.runLint = true;
 
 }
 
@@ -156,16 +158,29 @@ CSREngine.prototype = {
     	// Implement tab functionality
     	$('#csr-test-title').click(function () {
     		$('#csr-doc-tab').hide();
+    		$('#csr-jslint-tab').hide();
     		$('#csr-test-tab').show();
     		$('#csr-doc-title').removeClass('csr-selected');
+    		$('#csr-jslint-title').removeClass('csr-selected');
     		$('#csr-test-title').addClass('csr-selected');
     	});
     	
     	$('#csr-doc-title').click(function () {
     		$('#csr-test-tab').hide();
+    		$('#csr-jslint-tab').hide();
     		$('#csr-doc-tab').show();
     		$('#csr-test-title').removeClass('csr-selected');
+    		$('#csr-jslint-title').removeClass('csr-selected');
     		$('#csr-doc-title').addClass('csr-selected');
+    	});
+    	
+    	$('#csr-jslint-title').click(function () {
+    		$('#csr-test-tab').hide();
+    		$('#csr-doc-tab').hide();
+    		$('#csr-jslint-tab').show();
+    		$('#csr-test-title').removeClass('csr-selected');
+    		$('#csr-doc-title').removeClass('csr-selected');
+    		$('#csr-jslint-title').addClass('csr-selected');
     	});
     	
     	// Implement select all checkboxes
@@ -199,18 +214,29 @@ CSREngine.prototype = {
     },
     
     // populate the options panel
-    populateOptions: function () {
+    populateOptions: function (options) {
     	var engine = this;
     	
     	$('#csr-options-panel').append('<div class="csr-options-title"></div>');
-    	$('#csr-options-panel').append('<div id="csr-test-title" class="csr-options-tab"><h3>Test Suites</h3></div>');
-    	$('#csr-options-panel').append('<div id="csr-doc-title" class="csr-options-tab"><h3>Documents</h3></div>');
-    	$('#csr-options-panel').append('<div style="clear: both;"></div>');
-    	$('#csr-options-panel').append('<div id="csr-test-tab" class="csr-options-content"></div>');
-    	$('#csr-options-panel').append('<div id="csr-doc-tab" class="csr-options-content"></div>');
+    	$('#csr-options-panel').append('<div id="csr-options-content-wrapper"></div>');
+    	$('#csr-options-content-wrapper').append('<div id="csr-test-title" class="csr-options-tab"><h3>Test Suites</h3></div>');
+    	$('#csr-options-content-wrapper').append('<div id="csr-doc-title" class="csr-options-tab"><h3>Documents</h3></div>');
+    	$('#csr-options-content-wrapper').append('<div id="csr-jslint-title" class="csr-options-tab"><h3>JSLint</h3></div>');
+    	$('#csr-options-content-wrapper').append('<div style="clear: both;"></div>');
+    	$('#csr-options-content-wrapper').append('<div id="csr-test-tab" class="csr-options-content"></div>');
+    	$('#csr-options-content-wrapper').append('<div id="csr-doc-tab" class="csr-options-content"></div>');
+    	$('#csr-options-content-wrapper').append('<div id="csr-jslint-tab" class="csr-options-content"></div>');
+    	$('.csr-options-title').append('<button id="csr-options-toggle" class="csr">&#9660;</button>');
     	$('.csr-options-title').append('<button id="csr-options-button" class="csr">&nbsp;APPLY&nbsp;</button>');
     	$('#csr-options-button').click(function () {
     		engine.applyOptions();
+    	});
+    	$('#csr-options-toggle').toggle(function () {
+    		$('#csr-options-content-wrapper').slideUp();
+    		$(this).html('&#9650;');
+    	}, function () {
+    		$('#csr-options-content-wrapper').slideDown();
+    		$(this).html('&#9660');
     	});
     	
     	$('.csr-options-title').append('<h2>Options</h2>');
@@ -232,7 +258,6 @@ CSREngine.prototype = {
     		if (!engine.filters.ignore(doc.getShortName()))
     			$('.csr-options-checkbox[value="csr-' + doc.getShortName() + '"]').prop('checked', true);
     	}
-    	
     	$('.csr-options-checkbox[name="csr-test-suite-all"]').prop('checked', true);
     	$('.csr-options-checkbox[name="csr-test-suite"]').each(function () {
 			if ($(this).prop('checked') == false)
@@ -244,18 +269,33 @@ CSREngine.prototype = {
 			if ($(this).prop('checked') == false)
 				$('.csr-options-checkbox[name="csr-document-all"]').prop('checked', false);
 		});
+		
+		// JSLint options
+		engine.populateJSLintOptions(options);
     	
     	engine.defineOptionEvents();
     },
 
     // go through each document and run source code through appropriate test cases
-    analyzeDocuments: function () {
+    analyzeDocuments: function (lintOptions) {
     	var engine = this;
+	    	
+	    // JSLint options
+	    if (!lintOptions) {
+	    	lintOptions = {
+	        	"browser": true,
+	        	"devel": true,
+	        	"predef": ["jQuery", "$"],
+	        	"sloppy": true,
+	        	"vars": true,
+	        	"white": true
+        	};
+	    }
     	
         for (var i = 0; i < this.documents.length; i++) {
             var doc = this.documents[i];
             if (!engine.filters.ignore(doc.getShortName()) && doc.getContent()) {
-                var docAnalysis = new DocAnalysis(doc);
+                var docAnalysis = new DocAnalysis(doc, lintOptions);
                 docAnalysis.runAnalysis(engine.runHtml, engine.runCss, engine.runJavascript);
             }
         }
@@ -265,17 +305,31 @@ CSREngine.prototype = {
 		/*** TEST AREA ***/
 		var engine = this;
 		
-		//var pattern = "function doMath\\(\\)";
-		//var pattern = "console\\.log";
-		//var pattern = "parseInt";
-		var pattern = "^\\$\\(function\\(\\)\\s*\\{" + util.anything() + "\\}\\);$";
+		// Test Regex()
+		/*var pattern = "^\\$\\(function\\(\\)\\s*\\{" + util.anything() + "\\}\\);$";
 		var matches = engine.documents[6].regex(pattern);
 		   
 		for (var i=0; i<matches.length; i++) {
 			matches[i].printLines("Example multiline code block");
-		}
+		}*/
 		
-		matches = engine.documents[0].findTag("img");
+		// Test findTag()
+		/*matches = engine.documents[0].findTag("img");
+		for (var j=0; j<matches.length; j++) {
+			console.log(matches[j]);
+		}*/
+		
+		// Test findSelector()
+		/*matches = engine.documents[3].findSelector("#login");
+		for (var j=0; j<matches.length; j++) {
+			console.log(matches[j]);
+		}*/
+		
+		// Test findProperty()
+		/*matches = engine.documents[3].findProperty("font-family");
+		for (var j=0; j<matches.length; j++) {
+			console.log(matches[j]);
+		}*/
 		
 		/*JSLINT(engine.documents[6].getContent());
 		var data = JSLINT.data();
@@ -293,6 +347,7 @@ CSREngine.prototype = {
     	$('.csr-options-checkbox[value="csr-html"]').prop('checked') == true ? engine.runHtml = true : engine.runHtml = false;
     	$('.csr-options-checkbox[value="csr-css"]').prop('checked') == true ? engine.runCss = true : engine.runCss = false;
     	$('.csr-options-checkbox[value="csr-javascript"]').prop('checked') == true ? engine.runJavascript = true : engine.runJavascript = false;
+    	$('.csr-options-checkbox[name="csr-jslint-options-toggle"]').prop('checked') == true ? engine.runLint = true : engine.runLint = false;
     	
     	// Adjust filters for selected documents
     	for (var i=0; i<engine.documents.length; i++) {
@@ -332,7 +387,9 @@ CSREngine.prototype = {
     	
     	engine.populateDocuments();
         engine.populateTestCases();
-        engine.analyzeDocuments();
+        
+        var lintOptions = engine.applyJSLintOptions();
+        engine.analyzeDocuments(lintOptions);
         
         SyntaxHighlighter.highlight();
     },
@@ -353,7 +410,7 @@ CSREngine.prototype = {
         });
     },
 
-    runNormal: function () {
+    runNormal: function (options) {
         var engine = this;
 
         // Add CSR Engine stylesheet and create section before the body
@@ -379,8 +436,11 @@ CSREngine.prototype = {
 		            // Populate array of linked client-side documents
 		            engine.populateDocuments();
 		            engine.populateTestCases();
-		            engine.populateOptions();
-		            engine.analyzeDocuments();
+		            engine.populateOptions(options);
+		            var lintOptions = options.lintOptions[0];
+		            if (lintOptions["predef"])
+		            	engine.lintPredef = lintOptions["predef"];
+		            engine.analyzeDocuments(lintOptions);
 		
 		            engine.test();
 		         });
@@ -401,7 +461,10 @@ CSREngine.prototype = {
             // Populate array of linked client-side documents
             engine.populateDocuments();
             engine.populateTestCases();
-            engine.analyzeDocuments();
+            var lintOptions = options.lintOptions[0];
+            if (lintOptions["predef"])
+            	engine.lintPredef = lintOptions["predef"];
+            engine.analyzeDocuments(lintOptions);
 
             engine.test();
         });
@@ -435,6 +498,8 @@ CSREngine.prototype = {
 	    	this.runCss = options.css;
 	    if (options.javascript === false)
 	    	this.runJavascript = options.javascript;
+	    if (options.lint === false)
+	    	this.runLint = options.lint;
 
         // User has chosen to print to JavaScript console instead of within the page
         if (this.consolePrint) {
@@ -445,15 +510,88 @@ CSREngine.prototype = {
             this.runNormal(options);
         }
 
+    },
+    
+    // JSLint related
+    
+    populateJSLintOptions: function (options) {
+    	var engine = this;
+    	
+    	var lintOptions = options.lintOptions[0];
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options-toggle">Include JSLint Tests</input></div>');
+    	$('#csr-jslint-tab').append('<div style="background-color: #A8AAAC; height: 1px; margin-top: 4px;">&nbsp</div>');
+    	$('#csr-jslint-tab').append('<div style="background-color: #C8CACC; height: 1px; margin-bottom: 4px;">&nbsp</div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-passfail">Stop on First Error</input></div>');
+    	$('#csr-jslint-tab').append('<div style="background-color: #A8AAAC; height: 1px; margin-top: 4px;">&nbsp</div>');
+    	$('#csr-jslint-tab').append('<div style="background-color: #C8CACC; height: 1px; margin-bottom: 4px;">&nbsp</div>');
+    	$('#csr-jslint-tab').append('<h3 style="font-style: italic; margin-bottom: 2px;">Assume</h3>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-browser">Browser</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-couch">CouchDB</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-devel">Developer</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-node">Node.js</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-rhino">Rhine</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-windows">Windows</input></div>');
+    	$('#csr-jslint-tab').append('<div style="background-color: #A8AAAC; height: 1px; margin-top: 4px;">&nbsp</div>');
+    	$('#csr-jslint-tab').append('<div style="background-color: #C8CACC; height: 1px; margin-bottom: 4px;">&nbsp</div>');
+    	$('#csr-jslint-tab').append('<h3 style="font-style: italic; margin-bottom: 2px;">Tolerate</h3>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-ass">Assignment Expressions</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-bitwise">Bitwise Operators</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-closure">Google Closure</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-continue">Continue</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-debug">Debugger Statements</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-eqeq">== and !=</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-es5">ES5 Syntax</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-evil">Eval</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-forin">Unfiltered for in</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-newcap">Uncapitalized Constructors</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-nomen">Dangling _ in Identifiers</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-plusplus">++ and --</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-regexp">. and [^...] in /RegExp/</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-unparam">Unused Parameters</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-sloppy">Missing \'use strict\' Pragma</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-stupid">Stupidity</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-sub">Inefficient Subscripting</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-todo">TODO Comments</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-vars">Many var Statements / Function</input></div>');
+    	$('#csr-jslint-tab').append('<div class="csr-options-element"><input class="csr-options-checkbox" type="checkbox" name="csr-jslint-options" value="csr-jslint-white">Messy Whitespace</input></div>');
+    	
+    	// Check the appropriate default options
+    	if (engine.runLint)
+    		$('.csr-options-checkbox[name="csr-jslint-options-toggle"]').prop('checked', true);
+    	if (lintOptions) {
+    		for (var key in lintOptions) {
+				if (lintOptions[key])
+					$('.csr-options-checkbox[value="csr-jslint-' + key + '"]').prop('checked', true);
+    		}
+    	}
+    },
+    
+    applyJSLintOptions: function () {
+    	var engine = this;
+    	var lintOptions = { };
+    	
+    	// Populate JSLint options according to checked options
+    	$('.csr-options-checkbox[name="csr-jslint-options"]').each(function () {
+    		if ($(this).prop("checked")) {
+	    		var valPieces = $(this).prop("value").split('-');
+	        	var value = valPieces[valPieces.length-1];
+	        	lintOptions[value] = true;
+	        }
+    	});
+    	
+    	if (engine.lintPredef)
+    		lintOptions["predef"] = engine.lintPredef;
+    	return lintOptions;
     }
 
 };
 
 // DocAnalysis Class
 
-function DocAnalysis(document) {
+function DocAnalysis(document, lintOptions) {
 
     this.document = document;
+    this.lintOptions = lintOptions;
 
     this.initialize();
 
@@ -493,22 +631,14 @@ DocAnalysis.prototype = {
             }
         }
         
-        this.runJSLint();
+        if (window.CSREngine.runLint)
+        	this.runJSLint();
     },
     
     runJSLint: function () {
-    	// define jslint options
-        var options = {
-        	"browser": true,
-        	"devel": true,
-        	"predef": ["jQuery", "$"],
-        	"sloppy": true,
-        	"vars": true,
-        	"white": true
-        };
         
         // run jslint function ondocument content
-        JSLINT(this.document.getContent(), options);
+        JSLINT(this.document.getContent(), this.lintOptions);
 		var data = JSLINT.data();
 		//console.log(data);
 		
@@ -892,7 +1022,7 @@ Document.prototype = {
     				}
     				else if (openSQ == 0 && openDQ == 0) {
     					onAttr = true;
-    					match.attributeValues.push(curValue);
+    					match.values.push(curValue);
     					curValue = "";
     				}
     			}
@@ -907,7 +1037,7 @@ Document.prototype = {
     				}
     				else if (openSQ == 0 && openDQ == 0) {
     					onAttr = true;
-    					match.attributeValues.push(curValue);
+    					match.values.push(curValue);
     					curValue = "";
     				}
     			}	
@@ -922,14 +1052,14 @@ Document.prototype = {
     				match.lineEnd++;
     				if (onAttr == false && openDQ == 0 && openSQ == 0) {
     					onAttr = true;
-    					match.attributeValues.push(curValue);
+    					match.values.push(curValue);
     					curValue = "";
     				}
     			}
     			else if (c == ' ') {
     				if (onAttr == false && openDQ == 0 && openSQ == 0) {
     					onAttr = true;
-    					match.attributeValues.push(curValue);
+    					match.values.push(curValue);
     					curValue = "";
     				}
     				else if (onAttr == false && (openDQ > 0 || openSQ > 0)) {
@@ -942,7 +1072,7 @@ Document.prototype = {
     			match.attributes.push(curAttr);
     		}
     		if (curValue != "") {
-    			match.attributeValues.push(curValue);
+    			match.values.push(curValue);
     		}
     	}
     	return matches;
@@ -950,12 +1080,120 @@ Document.prototype = {
     
     // CSS: Helper to find instances of class/identifier and return properties and values
     findSelector: function (s) {
+    	var doc = this;
+    	var content = doc.getContent();
     	
+    	// find instances of selector s
+    	var pattern = s + "\\s*\\{";
+    	var matches = doc.regex(pattern);
+    	
+    	for (var i=0; i<matches.length; i++) {
+    		var match = matches[i];
+    		match.selector = s;
+    		
+    		var openCurly = 1;
+    		var curProp = "";
+    		var curValue = "";
+    		var onProp = true;
+    		
+    		var start = content.indexOf("{", match.indexStart);
+    		var j = start + 1;
+    		while (openCurly > 0) {
+    			var c = content[j];
+    			if (c == '{') {
+    				openCurly++;
+    				if (onProp == true) {
+    					curProp += c;
+    				} else {
+    					curValue += c;
+    				}
+    			}
+    			else if (c == '}') {
+    				openCurly--;
+    				if (openCurly != 0) {
+    					if (onProp == true) {
+	    					curProp += c;
+	    				} else {
+	    					curValue += c;
+	    				}
+    				}
+    			}
+    			else if (c == ':') {
+    				onProp = false;
+    				if (curProp.trim() != "")
+    					match.properties.push(curProp.trim());
+    				curProp = "";
+    			}
+    			else if (c == ';') {
+    				onProp = true;
+    				if (curValue.trim() != "")
+    					match.values.push(curValue.trim());
+    				curValue = "";
+    			}
+    			else if (c != '\n') {
+    				if (onProp == true) {
+    					curProp += c;
+    				} else {
+    					curValue += c;
+    				}
+    			}
+    			else if (c == '\n') {
+    				match.lineEnd++;
+    			}
+    			j++;
+    		}
+    		if (curProp != "") {
+    			if (curProp.trim() != "")
+    				match.properties.push(curProp.trim());
+    		}
+    		if (curValue != "") {
+    			if (curValue.trim() != "")
+    				match.values.push(curValue.trim());
+    		}
+    	}
+    	return matches;
     },
     
     // CSS: Helper to find instances of property and return containing identifier and values
     findProperty: function (prop) {
+    	var doc = this;
+    	var content = doc.getContent();
     	
+    	// find instances of selector s
+    	var pattern = prop + "\\s*\\:";
+    	var matches = doc.regex(pattern);
+    	
+    	for (var i=0; i<matches.length; i++) {
+    		var match = matches[i];
+    		match.property = prop;
+    		
+    		var semi = false;
+    		var curValue = "";
+    		
+    		var start = content.indexOf("\:", match.indexStart);
+    		var j = start + 1;
+    		while (!semi) {
+    			var c = content[j];
+    			if (c == ';') {
+    				if (curValue.trim() != "")
+    					match.value = curValue.trim();
+    				curValue = "";
+    				semi = true;
+    			}
+    			else if (c != '\n') {
+    				curValue += c;
+    			}
+    			else if (c == '\n') {
+    				match.lineEnd++;
+    			}
+    			j++;
+    		}
+    		if (curValue != "") {
+    			if (curValue.trim() != "")
+    				match.value = curValue.trim();
+    		}
+    	}
+    	return matches;
     }
 
 };
@@ -1073,7 +1311,15 @@ function Match(doc, code, lineStart, indexStart) {
 	// for findTag
 	this.tag;
 	this.attributes = [];
-	this.attributeValues = [];
+	this.values = [];
+	
+	// for findSelector()
+	this.selector;
+	this.properties = [];
+	
+	//for findProperty()
+	this.property;
+	this.value;
 	
 	this.initialize();
 	
