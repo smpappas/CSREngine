@@ -225,7 +225,7 @@ String parsing can be difficult, so some methods are provided to aid in searchin
 
 `Document.regex(pattern)` - Applies to HTML, CSS, JS
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Runs a regular expression against source code and returns all matching locations and lines. Returns an array of Match objects.
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You must use two forward slashes (\\) to escape characters.
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You must use two forward slashes (\\\\) to escape characters.
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Example usage:
 
     var pattern = "^\\$\\(function\\(\\)\\s*\\{" + util.anything() + "\\}\\);$";
@@ -257,7 +257,7 @@ String parsing can be difficult, so some methods are provided to aid in searchin
 
 #### The Match Class
 
-The Match class is used to return matches from regular expressions. Each of the above searching methods runs a regular expression against the source code and returns an array of matches. Each fo these matches contains various information that can be used and printed. The members of the Match class are
+The Match class is used to return matches from regular expressions. Each of the above search methods runs a regular expression against the source code and returns an array of matches. Each of these matches contains various information that can be used and printed. The members of the Match class are
 
 ```javascript
     doc  // Document where match was found
