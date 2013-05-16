@@ -134,11 +134,11 @@
 
 <h2>Developers</h2>
 
-<h4>Files</h4>
+<h3>Files</h3>
 
 <p>The directory structure looks as follows</p>
 
-<pre><code>CSREngine/
+<pre><code>csr-engine/
     css/
         csr-engine.css
         syntax/
@@ -159,58 +159,96 @@
 
 <p><code>js/csr-test-cases.js</code> - Contains the implementation of all test cases, as well as a list of all test cases to be run.<br><code>js/csr-engine.css</code> - Contains all styling for the engine.<br><code>css/csr-engine.js</code> - Contains all classes and code relevant to the core functionality of the engine.<br><code>js/beautify/beautify.js</code> - Un-minifies scripts so that they can be analyzed.<br><code>js/jslint/jslint.js</code> - Contains the core functionality for JSLint by Douglas Crockford.<br><code>js/syntax/*</code> - Contains all scripts related to syntax highlighting.<br><code>css/syntax/shCore.css</code> - Contains styling for syntax highlighting.<br></p>
 
-<h4>Hosting the Engine</h4>
+<h3>Hosting the Engine</h3>
 
 <p>The engine is currently hosted at: <a href="http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js">http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js</a></p>
 
 <p>To host the engine on a different server, each file needs to be uploaded to that server.  As explained above, the <code>&lt;script&gt;</code> tag in the Web page should link to the location of csr-engine.js.  In addition, csr-engine.js must be updated as described below.</p>
 
-<p>The CSREngine class contains two members called styleSheetLocation and testCaseLocation.  Update the following lines to contain the paths to each of these files, respectively.  These locations are defined toward the beginning of the file.</p>
+<p>The CSREngine class contains a member called locPrefix.  Update the following line to contain the paths to the root csr-engine/ folder.  This location is defined as the first member of the CSREngine class.</p>
 
-<pre><code>this.styleSheetLocation = "path/to/csr-engine.css";
-this.testCaseLocation = "path/to/csr-test-cases.js";
-</code></pre>
+<div class="highlight"><pre>    <span class="k">this</span><span class="p">.</span><span class="nx">locPrefix</span> <span class="o">=</span> <span class="s2">"path/to/csr-engine/"</span><span class="p">;</span>
+</pre></div>
 
-<h4>Managing and Writing User Defined Test Cases</h4>
+<h3>Managing and Writing User Defined Test Cases</h3>
 
 <p>Each test case is designated a type, which determines which files the test applies to.</p>
 
 <p>New test cases can be added into the file csr-test-cases.js. Existing test cases can be used as a guide. The steps to create a new test case are as follows.</p>
 
 <ol>
-<li>
-<p>Add a new entry to the populateTestCases function within the csrTestCases namespace.  The entry should look similar to below.  The first parameter specifies the namespace of the test case you are creating, always beginning with "csr" - look at examples for clarification.  The second parameter will specify the file that the test case resides in, but this should be left as null until this is implemented.  The last parameter specifies the type of test case and should be one of "html", "css", or "js".</p>
+<li> Add a new entry to the populateTestCases function within the csrTestCases namespace.  The entry should look similar to below.  The first parameter specifies the namespace of the test case you are creating, always beginning with "csr" - look at examples for clarification.  The second parameter will specify the file that the test case resides in, but this should be left as null until this is implemented.  The last parameter specifies the type of test case and should be one of "html", "css", or "js".</li>
+</ol><div class="highlight"><pre>    <span class="k">this</span><span class="p">.</span><span class="nx">addTestCase</span><span class="p">(</span><span class="s2">"csrNamespaceOfTestCase"</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">"html"</span><span class="p">);</span>
+</pre></div>
 
-<pre><code>this.addTestCase("csrNamespaceOfTestCase", null, "html");</code></pre>
-</li>
-<li>
-<p>Create a namespace for the test case and an execute function.  The format should be similar to below.</p>
+<ol>
+<li> Create a namespace for the test case and an execute function.  The format should be similar to below.</li>
+</ol><div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">csrNamespaceOfTestCase</span> <span class="o">=</span> <span class="p">{</span>
 
-<pre><code>var csrNamespaceOfTestCase = {
+        <span class="nx">execute</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nb">document</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Test body goes here</span>
+        <span class="p">}</span>
 
-    execute: function (document) {
-        // Test body goes here
-    }
+    <span class="p">};</span>
+</pre></div>
 
-};</code></pre>
-</li>
-</ol><p>The execute function of your new test case will be called automatically.  There is no restriction to adding more helper functions within your new test namespace, and in fact this is encouraged for code clarity.  These functions can be called from execute, i.e. execute() can be thought of as a main() function, where code execution for your test case begins.</p>
+<p>The execute function of your new test case will be called automatically.  There is no restriction to adding more helper functions within your new test namespace, and in fact this is encouraged for code clarity.  These functions can be called from execute, i.e. execute() can be thought of as a main() function, where code execution for your test case begins.</p>
 
-<h4>Helper Functions</h4>
+<p>A complete example can be seen below. This code will test to see if a radix has been specified when using the ParseInt() function in JavaScript.</p>
+
+<div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">csrNamespaceOfTestCase</span> <span class="o">=</span> <span class="p">{</span>
+
+        <span class="nx">execute</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nb">document</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">matches</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">findFunction</span><span class="p">(</span><span class="s2">"parseInt"</span><span class="p">);</span>
+
+            <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">matches</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">matches</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">args</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">matches</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">printLines</span><span class="p">(</span><span class="s2">"No radix specified."</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+    <span class="p">};</span>
+</pre></div>
+
+<h3>Searching and Scanning Document Code</h3>
+
+<p><code>Document.regex(pattern)</code> - Applies to HTML, CSS, JS
+<br>      </p>
+
+<p><code>Document.findFunction(f)</code> - Applies to JS
+<br>      Finds instances of a function and returns locations and arguments. Returns an array of Match objects.</p>
+
+<p>`Document.findTag(tag - Applies to HTML
+<br>      Finds instances of html tags and returns attribute values. Returns an array of Match objects.</p>
+
+<p><code>Document.findSelector(s)</code> - Applies to CSS
+<br>      Finds instances of class/identifier and returns properties and values. Returns an array of Match objects.</p>
+
+<p><code>Document.findProperty(prop)</code> - Applies to CSS
+<br>      Finds instances of property and returns and values. Returns an array of Match objects.</p>
+
+<h3>Additional Helper Functions</h3>
 
 <p>There are a number of helper functions available to help with implementing test cases.  Please use existing examples as reference.</p>
 
 <p><em>Documents</em></p>
 
 <p><code>Document.getLines()</code>
-<br>      Returns an array that consists of the document split into lines.  This allows traversal of the document line by line using a <strong>for</strong> loop or similar.</p>
+<br>      Returns an array that consists of the document split into lines. This allows traversal of the document line by line using a <strong>for</strong> loop or similar.</p>
+
+<p><code>Document.indexToLine(index)</code>
+<br>      Takes an index number and converts it to a line number in source code.</p>
+
+<p><code>Document.lineToCode(line)</code>
+<br>      Takes a line number and returns the source code of the line.</p>
 
 <p><code>Document.addError()</code>
-<br>      Should be called when an error is found.  This is used to track the number of errors found in each document.</p>
+<br>      Should be called when an error is found if not using the Match class. This is used to track the number of errors found in each document.</p>
 
 <p><em>Code Blocks</em></p>
 
-<p>A CodeBlock class has been implemented to make it easy to print formatted code to screen.  Example usage is shown below, and member functions are described.</p>
+<p>A CodeBlock class has been implemented to make it easy to print formatted code to screen. Example usage is shown below, and member functions are described.</p>
 
 <pre><code>var lines = document.getLines();
 for (var i = 0; i &lt; lines.length; i++) {
