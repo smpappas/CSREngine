@@ -190,14 +190,14 @@
 
 <p>Each test case is designated a type, which determines which files the test applies to.</p>
 
-<p>New test cases can be added into the file csr-test-cases.js. Existing test cases can be used as a guide. The steps to create a new test case are as follows.</p>
+<p>New test cases can be added into the file csr-test-cases.js. Existing test cases can be used as a guide. The steps to create a new test case are as follows</p>
 
-<p>(1)  Add a new entry to the populateTestCases function within the csrTestCases namespace.  The entry should look similar to below.  The first parameter specifies the namespace of the test case you are creating, always beginning with "csr" - look at examples for clarification.  The second parameter will specify the file that the test case resides in, but this should be left as null until this is implemented.  The last parameter specifies the type of test case and should be one of "html", "css", or "js".</p>
+<p>1)  Add a new entry to the populateTestCases function within the csrTestCases namespace.  The entry should look similar to below.  The first parameter specifies the namespace of the test case you are creating, always beginning with "csr" - look at examples for clarification.  The second parameter will specify the file that the test case resides in, but this should be left as null until this is implemented.  The last parameter specifies the type of test case and should be one of "html", "css", or "js".</p>
 
 <div class="highlight"><pre>    <span class="k">this</span><span class="p">.</span><span class="nx">addTestCase</span><span class="p">(</span><span class="s2">"csrNamespaceOfTestCase"</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">"html"</span><span class="p">);</span>
 </pre></div>
 
-<p>(2)  Create a namespace for the test case and an execute function.  The format should be similar to below.</p>
+<p>2)  Create a namespace for the test case and an execute function.  The format should be similar to below.</p>
 
 <div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">csrNamespaceOfTestCase</span> <span class="o">=</span> <span class="p">{</span>
 
