@@ -34,8 +34,6 @@
 
 <p>An example can be found at <a href="http://steve-pappas.com/csr">http://steve-pappas.com/csr</a></p>
 
-<p>If you would like to be added to this project or request that the repository be made public, please email me at smp2183 AT columbia DOT edu .</p>
-
 <h2>Users</h2>
 
 <h4>Dependencies</h4>
@@ -132,11 +130,29 @@
 
 <p>Please see the <a href="http://smpappas.github.io/CSREngine/developers">Developers</a> page for information about hosting and writing user defined tests.</p>
 
-<h2>Developers</h2>
+<hr><h2>Extensibility / Open Issues</h2>
 
-<h3>Files</h3>
+<h4>CSS Conflicts</h4>
 
-<p>The directory structure looks as follows</p>
+<p>Occasionally, the CSS code used for this project may conflict with the host Website's style. This code is constantly being tweaked as issues are encountered.</p>
+
+<h4>Test Cases</h4>
+
+<p>Currently, all test cases are located in the file csr-test-cases.js.  In the future, it may be the case that multiple developers are working on test cases concurrently.  To avoid csr-test-cases.js being edited by all test case developers, ideally test cases will be split out into multiple files.</p>
+
+<p>Initial attempts to divide test cases into multiple files created issues, so all test cases were moved into csr-test-cases.js for the time being.</p>
+
+<h4>More Test Cases</h4>
+
+<p>The Client-Side Reliability Engine provides a simple framework for creating user defined tests on HTML, CSS, and JavaScript code. Developers are free to contribute their own tests to the project. The more tests that are available, the better. Please see the <a href="http://smpappas.github.io/CSREngine/developers">Developers</a> page for information about writing user defined tests.</p>
+
+<hr><h2>Developers</h2>
+
+<p>This page is meant for advanced users and developers. Information on hosting, writing new tests, and general class reference is provided.</p>
+
+<h4>Files</h4>
+
+<p>The directory structure of the CSREngine looks as follows</p>
 
 <pre><code>csr-engine/
     css/
@@ -159,7 +175,7 @@
 
 <p><code>js/csr-test-cases.js</code> - Contains the implementation of all test cases, as well as a list of all test cases to be run.<br><code>js/csr-engine.css</code> - Contains all styling for the engine.<br><code>css/csr-engine.js</code> - Contains all classes and code relevant to the core functionality of the engine.<br><code>js/beautify/beautify.js</code> - Un-minifies scripts so that they can be analyzed.<br><code>js/jslint/jslint.js</code> - Contains the core functionality for JSLint by Douglas Crockford.<br><code>js/syntax/*</code> - Contains all scripts related to syntax highlighting.<br><code>css/syntax/shCore.css</code> - Contains styling for syntax highlighting.<br></p>
 
-<h3>Hosting the Engine</h3>
+<h4>Hosting the Engine</h4>
 
 <p>The engine is currently hosted at: <a href="http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js">http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js</a></p>
 
@@ -170,20 +186,20 @@
 <div class="highlight"><pre>    <span class="k">this</span><span class="p">.</span><span class="nx">locPrefix</span> <span class="o">=</span> <span class="s2">"path/to/csr-engine/"</span><span class="p">;</span>
 </pre></div>
 
-<h3>Managing and Writing User Defined Test Cases</h3>
+<h4>Managing and Writing User Defined Test Cases</h4>
 
 <p>Each test case is designated a type, which determines which files the test applies to.</p>
 
 <p>New test cases can be added into the file csr-test-cases.js. Existing test cases can be used as a guide. The steps to create a new test case are as follows.</p>
 
-<ol>
-<li> Add a new entry to the populateTestCases function within the csrTestCases namespace.  The entry should look similar to below.  The first parameter specifies the namespace of the test case you are creating, always beginning with "csr" - look at examples for clarification.  The second parameter will specify the file that the test case resides in, but this should be left as null until this is implemented.  The last parameter specifies the type of test case and should be one of "html", "css", or "js".</li>
-</ol><div class="highlight"><pre>    <span class="k">this</span><span class="p">.</span><span class="nx">addTestCase</span><span class="p">(</span><span class="s2">"csrNamespaceOfTestCase"</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">"html"</span><span class="p">);</span>
+<p>(1)  Add a new entry to the populateTestCases function within the csrTestCases namespace.  The entry should look similar to below.  The first parameter specifies the namespace of the test case you are creating, always beginning with "csr" - look at examples for clarification.  The second parameter will specify the file that the test case resides in, but this should be left as null until this is implemented.  The last parameter specifies the type of test case and should be one of "html", "css", or "js".</p>
+
+<div class="highlight"><pre>    <span class="k">this</span><span class="p">.</span><span class="nx">addTestCase</span><span class="p">(</span><span class="s2">"csrNamespaceOfTestCase"</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">"html"</span><span class="p">);</span>
 </pre></div>
 
-<ol>
-<li> Create a namespace for the test case and an execute function.  The format should be similar to below.</li>
-</ol><div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">csrNamespaceOfTestCase</span> <span class="o">=</span> <span class="p">{</span>
+<p>(2)  Create a namespace for the test case and an execute function.  The format should be similar to below.</p>
+
+<div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">csrNamespaceOfTestCase</span> <span class="o">=</span> <span class="p">{</span>
 
         <span class="nx">execute</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nb">document</span><span class="p">)</span> <span class="p">{</span>
             <span class="c1">// Test body goes here</span>
@@ -211,28 +227,89 @@
     <span class="p">};</span>
 </pre></div>
 
-<h3>Searching and Scanning Document Code</h3>
+<h4>Searching and Scanning Document Code</h4>
+
+<p>String parsing can be difficult, so some methods are provided to aid in searching and scanning the document. It is recommended to use these methods if possible in order to make the developer's life easier. Each method is described below along with sample usage.</p>
 
 <p><code>Document.regex(pattern)</code> - Applies to HTML, CSS, JS
-<br>      </p>
+<br>      Runs a regular expression against source code and returns all matching locations and lines. Returns an array of Match objects.
+<br>      You must use two forward slashes (\) to escape characters.
+<br>      Example usage:</p>
+
+<pre><code>var pattern = "^\\$\\(function\\(\\)\\s*\\{" + util.anything() + "\\}\\);$";
+var matches = document.regex(pattern);
+</code></pre>
 
 <p><code>Document.findFunction(f)</code> - Applies to JS
-<br>      Finds instances of a function and returns locations and arguments. Returns an array of Match objects.</p>
+<br>      Finds instances of a function and returns locations and arguments. Returns an array of Match objects.
+<br>      Example Usage:</p>
 
-<p>`Document.findTag(tag - Applies to HTML
-<br>      Finds instances of html tags and returns attribute values. Returns an array of Match objects.</p>
+<pre><code>var matches = document.findFunction("myFunction");
+</code></pre>
+
+<p><code>Document.findTag(tag)</code> - Applies to HTML
+<br>      Finds instances of html tags and returns attribute values. Returns an array of Match objects.
+<br>      Example Usage:</p>
+
+<pre><code>var matches = document.findTag("img");
+</code></pre>
 
 <p><code>Document.findSelector(s)</code> - Applies to CSS
-<br>      Finds instances of class/identifier and returns properties and values. Returns an array of Match objects.</p>
+<br>      Finds instances of class/identifier and returns properties and values. Returns an array of Match objects.
+<br>      Example Usage:</p>
+
+<pre><code>var matches = document.findSelector("#myId");
+</code></pre>
 
 <p><code>Document.findProperty(prop)</code> - Applies to CSS
-<br>      Finds instances of property and returns and values. Returns an array of Match objects.</p>
+<br>      Finds instances of property and returns and values. Returns an array of Match objects.
+<br>      Example Usage:</p>
 
-<h3>Additional Helper Functions</h3>
+<pre><code>var matches = document.findProperty("font-family");
+</code></pre>
 
-<p>There are a number of helper functions available to help with implementing test cases.  Please use existing examples as reference.</p>
+<h4>The Match Class</h4>
 
-<p><em>Documents</em></p>
+<p>The Match class is used to return matches from regular expressions. Each of the above searching methods runs a regular expression against the source code and returns an array of matches. Each fo these matches contains various information that can be used and printed. The members of the Match class are</p>
+
+<div class="highlight"><pre>    <span class="nx">doc</span>  <span class="c1">// Document where match was found</span>
+    <span class="nx">code</span>  <span class="c1">// Matching code from the regular expression</span>
+    <span class="nx">lineStart</span>  <span class="c1">// Line number that matching code starts on</span>
+    <span class="nx">indexStart</span>  <span class="c1">// Index that matching code start at</span>
+    <span class="nx">lineEnd</span>  <span class="c1">// Line number that matching code ends on</span>
+    <span class="nx">lineCode</span>  <span class="c1">// Entire first line of code of the match</span>
+
+    <span class="c1">// for findFunction()</span>
+    <span class="nx">functionName</span>  <span class="c1">// Name of function</span>
+    <span class="nx">args</span>  <span class="c1">// Array of function arguments</span>
+
+    <span class="c1">// for findTag</span>
+    <span class="nx">tag</span>  <span class="c1">// Tag being searched for</span>
+    <span class="nx">attributes</span>  <span class="c1">// Array of tag attributes</span>
+    <span class="nx">values</span>  <span class="c1">// Array of values for attributes</span>
+
+    <span class="c1">// for findSelector() - values contains array of property values</span>
+    <span class="nx">selector</span>  <span class="c1">// ID, class, or selector being searched for</span>
+    <span class="nx">properties</span>  <span class="c1">// Array of properties found in the selector</span>
+
+    <span class="c1">//for findProperty()</span>
+    <span class="nx">property</span>  <span class="c1">// Property being searched for</span>
+    <span class="nx">value</span>  <span class="c1">// Value for the property</span>
+</pre></div>
+
+<p>Depending on which search method is run, various members of the Match class will be populated. The developer can simply loop through an array of Match objects to access the information contained in each one. The Match class contains two print methods to easily print an issue to screen.</p>
+
+<p><code>Match.printMatch(errorText)</code>
+<br>      Automatically adds an error to the document and prints only code matching the regular expression. Takes in text of error message to print.</p>
+
+<p><code>Match.printLines(errorText)</code>
+<br>      Automatically adds an error to the document and prints all lines of code containing the regular expression. Takes in text of error message to print.</p>
+
+<h4>Additional Helper Functions</h4>
+
+<p>There are a number of additional helper functions available to help with implementing test cases. Please use existing examples as reference.</p>
+
+<p><strong>Documents</strong></p>
 
 <p><code>Document.getLines()</code>
 <br>      Returns an array that consists of the document split into lines. This allows traversal of the document line by line using a <strong>for</strong> loop or similar.</p>
@@ -246,19 +323,19 @@
 <p><code>Document.addError()</code>
 <br>      Should be called when an error is found if not using the Match class. This is used to track the number of errors found in each document.</p>
 
-<p><em>Code Blocks</em></p>
+<p><strong>Code Blocks</strong></p>
 
-<p>A CodeBlock class has been implemented to make it easy to print formatted code to screen. Example usage is shown below, and member functions are described.</p>
+<p>A CodeBlock class has been implemented to make it easy to print formatted code to screen. Example usage is shown below, and member functions are described. This class only needs to be instantiated if NOT using one of the main search methods.</p>
 
-<pre><code>var lines = document.getLines();
-for (var i = 0; i &lt; lines.length; i++) {
-    var line = lines[i];
+<div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getLines</span><span class="p">();</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">line</span> <span class="o">=</span> <span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
 
-    // Trim line to ensure trailing spaces and new lines are not included
-    var cb = new CodeBlock(line.trim(), i+1);
-    cb.print();
-}
-</code></pre>
+        <span class="c1">// Trim line to ensure trailing spaces and new lines are not included</span>
+        <span class="kd">var</span> <span class="nx">cb</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CodeBlock</span><span class="p">(</span><span class="nx">line</span><span class="p">.</span><span class="nx">trim</span><span class="p">(),</span> <span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+        <span class="nx">cb</span><span class="p">.</span><span class="nx">print</span><span class="p">();</span>
+    <span class="p">}</span>
+</pre></div>
 
 <p><code>CodeBlock(code, lineNumber)</code>
 <br>      Initialize a new CodeBlock instance with code found at lineNumber.  Parameters code and lineNumber are optional, and CodeBlock will be initialized to be empty if not specified.</p>
@@ -272,26 +349,24 @@ for (var i = 0; i &lt; lines.length; i++) {
 <p><code>CodeBlock.print()</code>
 <br>      Prints the current CodeBlock instance to screen.</p>
 
-<p><em>General Utility</em></p>
+<p><strong>General Utility</strong></p>
+
+<p><code>util.anything()</code>
+<br>      For use in regular expression patterns, this returns a pattern that will match any characters including new lines in regular expression.
+<br>      Example usage:</p>
+
+<pre><code>var pattern = "^\\$\\(function\\(\\)\\s*\\{" + util.anything() + "\\}\\);$";
+var matches = document.regex(pattern);
+</code></pre>
 
 <p><code>util.printString(s, classes)</code>
-<br>      Print string s to screen.  This function should always be used when printing to the tool output.  Parameter classes is optional and will add any specified CSS classes to the text output, e.g. to make text bold-italic specify "csr-bold csr-italic".</p>
+<br>      Print string s to screen.  This function should always be used when printing to the tool output. Parameter classes is optional and will add any specified CSS classes to the text output, e.g. to make text bold-italic specify "csr-bold csr-italic".</p>
 
 <p><code>util.printError(lineNumber, e)</code>
-<br>      Similar to util.printString(), prints error message e to screen.  Parameter lineNumber specifies which line the error occurred on.</p>
+<br>      Similar to util.printString(), prints error message e to screen. Parameter lineNumber specifies which line the error occurred on.</p>
 
 <p><code>util.escapeHTML(code)</code>
-<br>      When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters.  This prevents the browser from trying to execute or interpret code.</p>
-
-<hr><h2>Extensibility / Open Issues</h2>
-
-<h4>Things to do</h4>
-
-<h4>Test Cases</h4>
-
-<p>Currently, all test cases are located in the file csr-test-cases.js.  In the future, it may be the case that multiple developers are working on test cases concurrently.  To avoid csr-test-cases.js being edited by all test case developers, ideally test cases will be split out into multiple files.</p>
-
-<p>Initial attempts to divide test cases into multiple files created issues, so all test cases were moved into csr-test-cases.js for the time being.</p>
+<br>      When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters. This prevents the browser from trying to execute or interpret code. This does not need to be used when printing Match objects directly.</p>
 
 <hr><h2>Class Reference</h2>
 
@@ -301,41 +376,11 @@ for (var i = 0; i &lt; lines.length; i++) {
 
 <p>Used to create an instance of the engine where code execution begins.</p>
 
-<p><code>CSREngine.initialize()</code>
-<br>      Kicks off the engine analysis.</p>
-
-<p><code>CSREngine.runNormal()</code>
-<br>      Run analysis with option to print results above Web page.</p>
-
-<p><code>CSREngine.runConsole()</code>
-<br>      Run analysis with option priont results to JavaScript console.</p>
-
-<p><code>CSREngine.populateDocuments()</code>
-<br>      Search HTML source for <code>&lt;link&gt;</code> and <code>&lt;script&gt;</code> tags to populate array CSREngine.documents with all linked client-side files.</p>
-
-<p><code>CSREngine.populateTestCases()</code>
-<br>      Calls function <code>csrTestCases.populateTestCases()</code> located in csr-test-cases.js to populate an array of all current test cases.</p>
-
-<p><code>CSREngine.analyzeDocuments()</code>
-<br>      Creates an instance of DocAnalysis class for each linked client-side document and kicks off analysis on that document.</p>
-
 <h4>DocAnalysis Class</h4>
 
 <p>Used to run analysis on a particular document.</p>
 
-<p><code>DocAnalysis.runAnalysis()</code>
-<br>      Entry point for running analysis on a document.  Calls one of the below functions depending on the type of the document contained in the instance of the class.</p>
-
-<p><code>DocAnalysis.runHtmlAnalysis()</code>
-<br>      Runs all HTML test cases on the document.</p>
-
-<p><code>DocAnalysis.runCssAnalysis()</code>
-<br>      Runs all CSS test cases on the document.</p>
-
-<p><code>DocAnalysis.runJsAnalysis()</code>
-<br>      Runs all JavaScript test cases on the document.</p>
-
-<h5>TestCase Class</h5>
+<h4>TestCase Class</h4>
 
 <p>Contains information about a test case including its type and where the implementation is located.</p>
 
@@ -343,62 +388,17 @@ for (var i = 0; i &lt; lines.length; i++) {
 
 <p>Contains information about a document (file) including its location, type, and source code.</p>
 
-<p><code>Document.getLines()</code>
-<br>      Returns an array that consists of the document split into lines.  This allows traversal of the document line by line using a <strong>for</strong> loop or similar.</p>
-
-<p><code>Document.addError()</code>
-<br>      Should be called when an error is found in document.  This is used to track the number of errors found in each document.</p>
-
-<p><code>Document.readContent()</code>
-<br>      Performs and AJAX request to locate the document.  If the document is found, the source code is assigned to class member content'.</p>
-
-<p><code>Document.getContent()</code>
-<br>      Returns the source code of the document contained in class member 'content'.</p>
-
-<p><code>Document.printContent()</code>
-<br>      Prints the source code of the document to the JavaScript console.  This is mostly used for debugging.</p>
-
 <h4>Filters Class</h4>
 
 <p>Used to create document filters to specify which documents should and should not be analyzed.</p>
-
-<p><code>Filters.initialize()</code>
-<br>      Defines the default filters and pushes them onto an array held in class member 'filters'.</p>
-
-<p><code>Filters.getFilters()</code>
-<br>      Returns an array of all filters held in class member 'filters'.</p>
-
-<p><code>Filters.ignore(source)</code>
-<br>      Takes in a file name/location and returns true if the file should be ignored during the analysis, false otherwise.</p>
 
 <h4>CodeBlock Class</h4>
 
 <p>Used to create a block or line of code to be printed to screen.</p>
 
-<p><code>CodeBlock(code, lineNumber)</code>
-<br>      Initialize a new CodeBlock instance with code found at lineNumber.  Parameters code and lineNumber are optional, and CodeBlock will be initialized to be empty if not specified.</p>
-
-<p><code>CodeBlock.add(code, lineNumber)</code>
-<br>      Adds code found at lineNumber to current CodeBlock instance.  This can be used to create a single-line code block when the current instance is empty, or used to create multiline code blocks by calling this function on sequential lines of code.</p>
-
-<p><code>CodeBlock.clear()</code>
-<br>      Empties the current CodeBlock instance.  New code can be added to the existing code block through CodeBlock.add().</p>
-
-<p><code>CodeBlock.print()</code>
-<br>      Prints the current CodeBlock instance to screen.</p>
-
 <h4>util (Utility Namespace)</h4>
 
 <p>Contains a number of utility and helper functions for use in implementing core functionality and test cases.</p>
-
-<p><code>util.printString(s, classes)</code>
-<br>      Print string s to screen.  This function should always be used when printing to the tool output.  Parameter classes is optional and will add any specified CSS classes to the text output, e.g. to make text bold-italic specify "csr-bold csr-italic".</p>
-
-<p><code>util.printError(lineNumber, e)</code>
-<br>      Similar to util.printString(), prints error message e to screen.  Parameter lineNumber specifies which line the error occurred on.</p>
-
-<p><code>util.escapeHTML(code)</code>
-<br>      When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters.  This prevents the browser from trying to execute or interpret code.</p>
         </section>
 
         <aside id="sidebar">
