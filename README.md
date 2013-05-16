@@ -1,115 +1,321 @@
 Client-Side Reliability Engine
 ==============================
 
-The Client-Side Reliability Engine provides feedback on common bugs associated with HTML, CSS, and JavaScript code.  The engine helps to ensure that best practices are being employed to improve reliability and reduce the chance of undesired results.
+The Client-Side Reliability Engine provides feedback on common bugs associated with HTML, CSS, and JavaScript code. The engine helps to ensure that best practices are being employed to improve reliability and reduce the chance of undesired results.
 
-### Users
+An example can be found at [http://steve-pappas.com/csr](http://steve-pappas.com/csr)
 
-__Dependencies__
+## Users
 
-The Client-Side Reliability Engine makes use of jQuery and requires version 1.6 or higher.  For more information on jQuery, visit http://www.jquery.com.
+#### Dependencies
+
+The Client-Side Reliability Engine makes use of jQuery and requires version 1.6 or higher. For more information on jQuery, visit http://www.jquery.com.
 
 jQuery can be referenced from Google's CDN by placing the following code inside the `<head>` tag of your page
 
+```html
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
+```
 
-__Usage__
+#### Usage
 
 In the `<head>` tag of your page, include the following reference
 
+```html
+    <script src="http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js" type="text/javascript"></script>
+```
+
+You may also host the project separately. Please see the <a href="http://smpappas.github.io/CSREngine/developers" style="font-weight: bold;">Developers</a> page for information about hosting. If hosted separately, include the following reference instead
+
+
+```html
     <script src="/path/to/csr-engine.js" type="text/javascript"></script>
+```
 
 At the bottom of the `<head>` tag, also include the following script block
 
+```html
     <script type="text/javascript">
         $(function () {
-            CSREngine.initialize(false);
-        });
+                var options = { }
+                
+                CSREngine.initialize(options);
+            });
     </script>
+```
 
 This script block initializes the Client-Side Reliability Engine and runs an analysis with the default options.
 
-__Options__
+#### Options
 
-Options are not currently implemented, but the intention is to allow users to customize their experience.  In the future, users should be able to designate (i) specific files that should NOT be filtered out, and (ii) whether to output results to the web page or JavaScript console.
+Options can be defined both in the `<script>` drop-in code to replace defaults, or chosen from the options panel within your Web page. An example script to set the default options is shown below.
 
-__Filters__
+```html
+    <script type="text/javascript">
+        $(function () {
+                var options = {
+                    "html": true,
+                    "css": true,
+                    "javascript": true,
+                    "filters": [
+                        "tria1.js",
+                        "trial2.js"
+                    ],
+                    "noFilters": [
+                        
+                    ],
+                    "lint": true,
+                    // define jslint options
+                    "lintOptions": [ {
+                        "browser": true,
+                        "devel": true,
+                        "predef": ["jQuery", "$"],
+                        "sloppy": true,
+                        "vars": true,
+                        "white": true
+                    } ]
+                }
+                
+                CSREngine.initialize(options);
+            });
+    </script>
+```
 
-By default, common third-party libraries and frameworks, such as jQuery, MooTools, and backbone.js, are not analyzed by the engine.  Adding and removing files from the filter is discussed further in the Developer section.
+The following options are available
 
-__Test Cases__
+`"html"` - true to run HTML tests, false otherwise. Default is true.<br />
+`"css"` - true to run CSS tests, false otherwise. Default is true.<br />
+`"javascript"` - true to run JavaScript tests, false otherwise. Default is true.<br />
+`"filters"` - List files that should not be included in the tests. For example, you may not want to include third-party library files that would not be filtered out by default.<br />
+`"noFilters"` - List of files that should always be included in the tests. This will override the default filters.<br />
+`"lint"` - true to run JSLint on JavaScript files, false otherwise. Default is true.<br />
+`"lintOptions"` - Set the JSLint options. Defaults are shown in example above. Please see Options section at http://www.jslint.com/lint.html for details of each available option.<br />
 
-The Client-Side Reliability Engine runs a series of test cases on each client-side file to determine if any issues exist. These tests perform static code analysis on each file, meaning no code within the file is actually executed.
+Options will reset to these defaults on each refresh, but all options can be selected ad hoc through the options panel within the page.
 
-Each test case is designated a type, which determines which files the test applies to. A list of currently implemented test cases is shown below along with the file type the test is associated with.
+#### Test Cases
 
-    Missing alternative text for images                         -   HTML
-    Missing script type                                         -   HTML
-    Using 'onclick' to attach a JavaScript event handler        -   HTML
-    Defining units for zero values                              -   CSS
-    Not specifying fallback fonts, i.e. no font stack           -   CSS
-    Not specifying a radix when converting strings to integers  -   JavaScript
-    Specifying a radix when converting strings to floats        -   JavaScript
-    Using type wrapper objects inappropriately                  -   JavaScript
-<br />
+The Client-Side Reliability Engine runs a series of test cases on each client-side file to determine if any issues exist. These tests perform static code analysis on each file, meaning no code within the file is actually executed. Test are grouped into test suites by file type. Each suite of tests can be added or removed from analysis through the Web page options panel.
+
+Please see the "Managing and Writing User Defined Test Cases" topic within the Developers section for more detail about user defined tests.
+
+#### JSLint Integration
+
+The Client-Side Reliability engine integrates JSLint to perform tests on JavaScript files. Integration is turned on by default, but can be turned off within script options or the options panel.
+
+All major JSLint options are available. Please see Options section at http://www.jslint.com/lint.html for details of each available option.
+
+#### Filters
+
+By default, common third-party libraries and frameworks, such as jQuery, MooTools, and backbone.js, are not analyzed by the engine. Default files to filter out can be added through the options discussed above. To override a file that is filtered out by default, add the file to the "noFilters" option. Files can also be added or removed from analysis through the Web page options panel.
 
 ---
 
-### Developers
+## Extensibility / Open Issues
 
-__Files__
+#### CSS Conflicts
 
-`csr-engine.js` - Contains all classes and code relevant to the core functionality of the engine.<br />
-`csr-test-cases.js` - Contains the implementation of all test cases, as well as a list of all test cases to be run.<br />
-`csr-engine.css` - Contains all styling for the engine.
+Occasionally, the CSS code used for this project may conflict with the host Website's style. This code is constantly being tweaked as issues are encountered.
 
-__Hosting the Engine__
+#### Test Cases
+
+Currently, all test cases are located in the file csr-test-cases.js.  In the future, it may be the case that multiple developers are working on test cases concurrently.  To avoid csr-test-cases.js being edited by all test case developers, ideally test cases will be split out into multiple files.
+
+Initial attempts to divide test cases into multiple files created issues, so all test cases were moved into csr-test-cases.js for the time being.
+
+#### More Test Cases
+
+The Client-Side Reliability Engine provides a simple framework for creating user defined tests on HTML, CSS, and JavaScript code. Developers are free to contribute their own tests to the project. The more tests that are available, the better. Please see the <a href="http://smpappas.github.io/CSREngine/developers" style="font-weight: bold;">Developers</a> page for information about writing user defined tests.
+
+---
+
+## Developers
+
+This page is meant for advanced users and developers. Information on hosting, writing new tests, and general class reference is provided.
+
+#### Files
+
+The directory structure of the CSREngine looks as follows
+
+    csr-engine/
+        css/
+            csr-engine.css
+            syntax/
+                shCore.css
+        js/
+            csr-engine.js
+            csr-test-cases.js
+            beautify/
+                beautify.js
+            jslint/
+                jslint.js
+            syntax/
+                shBrushCss.js
+                shBrushJScript.js
+                shBrushXml.js
+                shCore.js
+
+`js/csr-test-cases.js` - Contains the implementation of all test cases, as well as a list of all test cases to be run.<br />
+`js/csr-engine.css` - Contains all styling for the engine.<br />
+`css/csr-engine.js` - Contains all classes and code relevant to the core functionality of the engine.<br />
+`js/beautify/beautify.js` - Un-minifies scripts so that they can be analyzed.<br />
+`js/jslint/jslint.js` - Contains the core functionality for JSLint by Douglas Crockford.<br />
+`js/syntax/*` - Contains all scripts related to syntax highlighting.<br />
+`css/syntax/shCore.css` - Contains styling for syntax highlighting.<br />
+
+#### Hosting the Engine
 
 The engine is currently hosted at: http://www.steve-pappas.com/staticsmp/csr-engine/js/csr-engine.js
 
 To host the engine on a different server, each file needs to be uploaded to that server.  As explained above, the `<script>` tag in the Web page should link to the location of csr-engine.js.  In addition, csr-engine.js must be updated as described below.
 
-The CSREngine class contains two members called styleSheetLocation and testCaseLocation.  Update the following lines to contain the paths to each of these files, respectively.  These locations are defined toward the beginning of the file.
+The CSREngine class contains a member called locPrefix.  Update the following line to contain the paths to the root csr-engine/ folder.  This location is defined as the first member of the CSREngine class.
 
-    this.styleSheetLocation = "path/to/csr-engine.css";
-    this.testCaseLocation = "path/to/csr-test-cases.js";
+```javascript
+    this.locPrefix = "path/to/csr-engine/";
+```
 
-__Adding a New Test Case__
+#### Managing and Writing User Defined Test Cases
 
-New test cases can be added into the file csr-test-cases.js.  Existing test cases can be used as a guide.  The steps to create a new test case are as follows.
+Each test case is designated a type, which determines which files the test applies to.
 
-1.  Add a new entry to the populateTestCases function within the csrTestCases namespace.  The entry should look similar to below.  The first parameter specifies the namespace of the test case you are creating, always beginning with "csr" - look at examples for clarification.  The second parameter will specify the file that the test case resides in, but this should be left as null until this is implemented.  The last parameter specifies the type of test case and should be one of "html", "css", or "js".
+New test cases can be added into the file csr-test-cases.js. Existing test cases can be used as a guide. The steps to create a new test case are as follows
+
+1) &nbsp;Add a new entry to the populateTestCases function within the csrTestCases namespace.  The entry should look similar to below.  The first parameter specifies the namespace of the test case you are creating, always beginning with "csr" - look at examples for clarification.  The second parameter will specify the file that the test case resides in, but this should be left as null until this is implemented.  The last parameter specifies the type of test case and should be one of "html", "css", or "js".
     
-    <pre><code>this.addTestCase("csrNamespaceOfTestCase", null, "html");</code></pre>
+```javascript
+    this.addTestCase("csrNamespaceOfTestCase", null, "html");
+```
 
-2.  Create a namespace for the test case and an execute function.  The format should be similar to below.
+2) &nbsp;Create a namespace for the test case and an execute function.  The format should be similar to below.
 
-    <pre><code>var csrNamespaceOfTestCase = {
+```javascript
+    var csrNamespaceOfTestCase = {
     
         execute: function (document) {
             // Test body goes here
         }
         
-    };</code></pre>
+    };
+```
     
 The execute function of your new test case will be called automatically.  There is no restriction to adding more helper functions within your new test namespace, and in fact this is encouraged for code clarity.  These functions can be called from execute, i.e. execute() can be thought of as a main() function, where code execution for your test case begins.
 
-__Helper Functions__
+A complete example can be seen below. This code will test to see if a radix has been specified when using the ParseInt() function in JavaScript.
 
-There are a number of helper functions available to help with implementing test cases.  Please use existing examples as reference.
+```javascript
+    var csrNamespaceOfTestCase = {
 
-_Documents_
+        execute: function (document) {
+            var matches = document.findFunction("parseInt");
+               
+            for (var i=0; i<matches.length; i++) {
+                if (matches[i].args.length <= 1) {
+                    matches[i].printLines("No radix specified.");
+                }
+            }
+        }
 
-__`Document.getLines()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns an array that consists of the document split into lines.  This allows traversal of the document line by line using a __for__ loop or similar.
+    };
+```
 
-__`Document.addError()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Should be called when an error is found.  This is used to track the number of errors found in each document.
+#### Searching and Scanning Document Code
 
-_Code Blocks_
+String parsing can be difficult, so some methods are provided to aid in searching and scanning the document. It is recommended to use these methods if possible in order to make the developer's life easier. Each method is described below along with sample usage.
 
-A CodeBlock class has been implemented to make it easy to print formatted code to screen.  Example usage is shown below, and member functions are described.
+`Document.regex(pattern)` - Applies to HTML, CSS, JS
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Runs a regular expression against source code and returns all matching locations and lines. Returns an array of Match objects.
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You must use two forward slashes (\\) to escape characters.
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Example usage:
 
+    var pattern = "^\\$\\(function\\(\\)\\s*\\{" + util.anything() + "\\}\\);$";
+    var matches = document.regex(pattern);
+
+`Document.findFunction(f)` - Applies to JS
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Finds instances of a function and returns locations and arguments. Returns an array of Match objects.
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Example Usage:
+
+    var matches = document.findFunction("myFunction");
+
+`Document.findTag(tag)` - Applies to HTML
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Finds instances of html tags and returns attribute values. Returns an array of Match objects.
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Example Usage:
+
+    var matches = document.findTag("img");
+
+`Document.findSelector(s)` - Applies to CSS
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Finds instances of class/identifier and returns properties and values. Returns an array of Match objects.
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Example Usage:
+
+    var matches = document.findSelector("#myId");
+
+`Document.findProperty(prop)` - Applies to CSS
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Finds instances of property and returns and values. Returns an array of Match objects.
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Example Usage:
+
+    var matches = document.findProperty("font-family");
+
+#### The Match Class
+
+The Match class is used to return matches from regular expressions. Each of the above searching methods runs a regular expression against the source code and returns an array of matches. Each fo these matches contains various information that can be used and printed. The members of the Match class are
+
+```javascript
+    doc  // Document where match was found
+    code  // Matching code from the regular expression
+    lineStart  // Line number that matching code starts on
+    indexStart  // Index that matching code start at
+    lineEnd  // Line number that matching code ends on
+    lineCode  // Entire first line of code of the match
+    
+    // for findFunction()
+    functionName  // Name of function
+    args  // Array of function arguments
+
+    // for findTag
+    tag  // Tag being searched for
+    attributes  // Array of tag attributes
+    values  // Array of values for attributes
+    
+    // for findSelector() - values contains array of property values
+    selector  // ID, class, or selector being searched for
+    properties  // Array of properties found in the selector
+    
+    //for findProperty()
+    property  // Property being searched for
+    value  // Value for the property
+```
+
+Depending on which search method is run, various members of the Match class will be populated. The developer can simply loop through an array of Match objects to access the information contained in each one. The Match class contains two print methods to easily print an issue to screen.
+
+`Match.printMatch(errorText)`
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Automatically adds an error to the document and prints only code matching the regular expression. Takes in text of error message to print.
+
+`Match.printLines(errorText)`
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Automatically adds an error to the document and prints all lines of code containing the regular expression. Takes in text of error message to print.
+
+#### Additional Helper Functions
+
+There are a number of additional helper functions available to help with implementing test cases. Please use existing examples as reference.
+
+__Documents__
+
+`Document.getLines()`
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns an array that consists of the document split into lines. This allows traversal of the document line by line using a __for__ loop or similar.
+
+`Document.indexToLine(index)`
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Takes an index number and converts it to a line number in source code.
+
+`Document.lineToCode(line)`
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Takes a line number and returns the source code of the line.
+
+`Document.addError()`
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Should be called when an error is found if not using the Match class. This is used to track the number of errors found in each document.
+
+__Code Blocks__
+
+A CodeBlock class has been implemented to make it easy to print formatted code to screen. Example usage is shown below, and member functions are described. This class only needs to be instantiated if NOT using one of the main search methods.
+
+```javascript
     var lines = document.getLines();
     for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
@@ -118,175 +324,72 @@ A CodeBlock class has been implemented to make it easy to print formatted code t
         var cb = new CodeBlock(line.trim(), i+1);
         cb.print();
     }
+```
     
-__`CodeBlock(code, lineNumber)`__
+`CodeBlock(code, lineNumber)`
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Initialize a new CodeBlock instance with code found at lineNumber.  Parameters code and lineNumber are optional, and CodeBlock will be initialized to be empty if not specified.
 
-__`CodeBlock.add(code, lineNumber)`__
+`CodeBlock.add(code, lineNumber)`
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adds code found at lineNumber to current CodeBlock instance.  This can be used to create a single-line code block when the current instance is empty, or used to create multiline code blocks by calling this function on sequential lines of code.
 
-__`CodeBlock.clear()`__
+`CodeBlock.clear()`
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Empties the current CodeBlock instance.  New code can be added to the existing code block through CodeBlock.add().
 
-__`CodeBlock.print()`__
+`CodeBlock.print()`
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prints the current CodeBlock instance to screen.
 
-_General Utility_
+__General Utility__
 
-__`util.printString(s, classes)`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print string s to screen.  This function should always be used when printing to the tool output.  Parameter classes is optional and will add any specified CSS classes to the text output, e.g. to make text bold-italic specify "csr-bold csr-italic".
+`util.anything()`
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For use in regular expression patterns, this returns a pattern that will match any characters including new lines in regular expression.
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Example usage:
 
-__`util.printError(lineNumber, e)`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Similar to util.printString(), prints error message e to screen.  Parameter lineNumber specifies which line the error occurred on.
+    var pattern = "^\\$\\(function\\(\\)\\s*\\{" + util.anything() + "\\}\\);$";
+    var matches = document.regex(pattern);
 
-__`util.escapeHTML(code)`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters.  This prevents the browser from trying to execute or interpret code.
+`util.printString(s, classes)`
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print string s to screen.  This function should always be used when printing to the tool output. Parameter classes is optional and will add any specified CSS classes to the text output, e.g. to make text bold-italic specify "csr-bold csr-italic".
 
-__Filters__
+`util.printError(lineNumber, e)`
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Similar to util.printString(), prints error message e to screen. Parameter lineNumber specifies which line the error occurred on.
 
-The Filters class in csr-engine.js specifies files that will not be analyzed.  The function `initialize()` contains a number of lines similar to the following.
+`util.escapeHTML(code)`
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters. This prevents the browser from trying to execute or interpret code. This does not need to be used when printing Match objects directly.
 
-    this.filters.push("csr-engine");
-    
-This line will filter out all CSS and JS files where the file name contains "csr-engine", e.g. csr-engine-xxx.js.  To add new filtered files, simply add new lines in the `initialize()` function.  To remove filtered files, simply remove or comment out the appropriate lines.
+---
 
---
-
-### Extensibility
-
-__Filters__
-
-The filters class currently filters out all files where the file name contains a substring as specified in `this.filters.push(substring)`.  A case may exist where the user wants to filter out some files that match this substring, but analyze others as normal.
-For example, it is likely that files named 'jquery-xxx' should be filtered out, but a user may make a custom extension called 'jquery-custom-extension-xxx'.  The Filters class could be expanded to allow the user to designate specific files that should not be filtered out, allowing user created files such as this to be analyzed.
-
-__Options__
-
-Though options have not been implemented yet, a number of options should be available to users in the future.  These options could be specified in the initialization script on the page, which might look similar to the following.
-
-    <script type="text/javascript">
-        $(function () {
-            var options = { /* insert all options here */ };
-            CSREngine.initialize(options);
-        });
-    </script>
-    
-(i) Console Printing - Currently, the engine outputs all results above the current page.  This is specified in the line `CSREngine.initialize(false)`.  The user has the option of instead printing all results to the JavaScript console by specifying `CSREngine.initialize(true)`, making the output a bit less obtrusive.
-
-Although this functionality is not yet implemented, the member function `runConsole()` in the CSREngine class is a jumping off point.  Likely, all utility functions and member functions of the CodeBlock class will have to take this condition into account in order to print to console instead of to the Web page.
-
-(ii) Filters - As described above, the user needs a way to designate specific files that will always be analyzed, as well as files that should not be analyzed and are not part of the default filters.  These files should be made a part of the user options when initializing the CSREngine.
-
-__Test Cases__
-
-Currently, all test cases are located in the file csr-test-cases.js.  In the future, it may be the case that multiple developers are working on test cases concurrently.  To avoid csr-test-cases.js being edited by all test case developers, ideally test cases will be split out into multiple files.
-
-Initial attempts to divide test cases into multiple files created issues, so all test cases were moved into csr-test-cases.js for the time being.
-
---
-
-### Class Reference
+## Class Reference
 
 Class descriptions and primary member functions listed below.
 
-___CSREngine Class___
+#### CSREngine Class
 
 Used to create an instance of the engine where code execution begins.
 
-__`CSREngine.initialize()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kicks off the engine analysis.
-
-__`CSREngine.runNormal()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Run analysis with option to print results above Web page.
-
-__`CSREngine.runConsole()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Run analysis with option priont results to JavaScript console.
-
-<b>`CSREngine.populateDocuments()`</b>
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Search HTML source for `<link>` and `<script>` tags to populate array CSREngine.documents with all linked client-side files.
-
-<b>`CSREngine.populateTestCases()`</b>
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calls function `csrTestCases.populateTestCases()` located in csr-test-cases.js to populate an array of all current test cases.
-
-__`CSREngine.analyzeDocuments()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creates an instance of DocAnalysis class for each linked client-side document and kicks off analysis on that document.
-
-___DocAnalysis Class___
+#### DocAnalysis Class
 
 Used to run analysis on a particular document.
 
-__`DocAnalysis.runAnalysis()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Entry point for running analysis on a document.  Calls one of the below functions depending on the type of the document contained in the instance of the class.
-
-__`DocAnalysis.runHtmlAnalysis()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Runs all HTML test cases on the document.
-
-__`DocAnalysis.runCssAnalysis()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Runs all CSS test cases on the document.
-
-__`DocAnalysis.runJsAnalysis()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Runs all JavaScript test cases on the document.
-
-___TestCase Class___
+#### TestCase Class
 
 Contains information about a test case including its type and where the implementation is located.
 
-___Document Class___
+#### Document Class
 
 Contains information about a document (file) including its location, type, and source code.
 
-__`Document.getLines()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns an array that consists of the document split into lines.  This allows traversal of the document line by line using a __for__ loop or similar.
-
-__`Document.addError()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Should be called when an error is found in document.  This is used to track the number of errors found in each document.
-
-__`Document.readContent()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Performs and AJAX request to locate the document.  If the document is found, the source code is assigned to class member content'.
-
-__`Document.getContent()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the source code of the document contained in class member 'content'.
-
-__`Document.printContent()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prints the source code of the document to the JavaScript console.  This is mostly used for debugging.
-
-___Filters Class___
+#### Filters Class
 
 Used to create document filters to specify which documents should and should not be analyzed.
 
-__`Filters.initialize()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defines the default filters and pushes them onto an array held in class member 'filters'.
+#### Match Class
 
-__`Filters.getFilters()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns an array of all filters held in class member 'filters'.
+Used to return and manipulate information obtained from running a regular expression on source code.
 
-__`Filters.ignore(source)`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Takes in a file name/location and returns true if the file should be ignored during the analysis, false otherwise.
-
-___CodeBlock Class___
+#### CodeBlock Class
 
 Used to create a block or line of code to be printed to screen.
 
-__`CodeBlock(code, lineNumber)`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Initialize a new CodeBlock instance with code found at lineNumber.  Parameters code and lineNumber are optional, and CodeBlock will be initialized to be empty if not specified.
-
-__`CodeBlock.add(code, lineNumber)`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adds code found at lineNumber to current CodeBlock instance.  This can be used to create a single-line code block when the current instance is empty, or used to create multiline code blocks by calling this function on sequential lines of code.
-
-__`CodeBlock.clear()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Empties the current CodeBlock instance.  New code can be added to the existing code block through CodeBlock.add().
-
-__`CodeBlock.print()`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prints the current CodeBlock instance to screen.
-
-___util (Utility Namespace)___
+#### util (Utility Namespace)
 
 Contains a number of utility and helper functions for use in implementing core functionality and test cases.
-
-__`util.printString(s, classes)`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print string s to screen.  This function should always be used when printing to the tool output.  Parameter classes is optional and will add any specified CSS classes to the text output, e.g. to make text bold-italic specify "csr-bold csr-italic".
-
-__`util.printError(lineNumber, e)`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Similar to util.printString(), prints error message e to screen.  Parameter lineNumber specifies which line the error occurred on.
-
-__`util.escapeHTML(code)`__
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When printing HTML code to screen, the code must be wrapped in this function in order to escape special characters.  This prevents the browser from trying to execute or interpret code.
